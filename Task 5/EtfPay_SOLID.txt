@@ -14,7 +14,7 @@
 	-Uloga kao Enum omogućava jednostavno dodavanje novih korisničkih uloga bez 
 	mijenjanja osnovne logike sistema.
 	-Novi tipovi računa, transakcija ili predložaka mogu se dodavati kroz nasljeđivanje
-	 ili proširenje postojećih komponenti.
+	 ili proširenje postojećih komponenti. 
 
 3.  Liskov Substitution Principle - Liskov princip zamjene
 	-Svaka buduća izvedena klasa iz Osoba mora moći zamijeniti osnovnu klasu
