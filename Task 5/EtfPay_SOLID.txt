@@ -1,41 +1,38 @@
 1.  Single Responsibility Principle - Princip pojedinačne odgovornosti
 	U modelu su odgovornosti jasno razgraničene:
-	-Klase Osoba, Klijent, Uposlenik su isključivo zadužene za čuvanje identiteta 
-	i atributa korisnika. Klasa Osoba drži opšte podatke (Ime, Prezime, JMBG),
-	dok podklase drže atribute specifične za neku osobu(npr. Uloga za uposlenika ili Racun za klijenta).
+	-Klasa Osoba je isključivo zadužena za čuvanje identiteta 
+	i atributa korisnika.
 	-Transakcija: Ova klasa je odgovorna isključivo za logiku i podatke vezane za prenos 
-	sredstava (ID, veza sa klijentima). 
+	sredstava (ID, veza sa Osobom). 
 	-Račun: Zadužen je samo za podatke o bankovnom računu (brojRacuna).
 	-Kurs: Odgovoran je samo za informacije o valutama, 
 	bez miješanja u logiku transakcija ili korisničkih računa.
 
 2. Open/Closed Principle - Princip otvoreno/zatvoreno
-        Dizajn koristi nasljeđivanje kako bi omogućio proširenje sistema bez mijenjanja
-	postojećeg koda:
-	-Hijerarhija klasa AspNetUser -> Osoba -> Klijent / Uposlenik omogućava da u budućnosti 
-	dodamo nove tipove osoba jednostavnim nasljeđivanjem klase Osoba,
-	 bez potrebe da mijenjamo logiku u klasama Osoba ili AspNetUser.
-	-Klasa Uloga je definisana kao Enum objekat, što olakšava dodavanje novih uloga 
-	 u sistem bez mijenjanja strukture klase Uposlenik.
+       -Klasa Osoba može se u budućnosti proširiti novim specijalizovanim tipovima 
+	korisnika bez izmjene postojeće strukture.
+	-Uloga kao Enum omogućava jednostavno dodavanje novih korisničkih uloga bez 
+	mijenjanja osnovne logike sistema.
+	-Novi tipovi računa, transakcija ili predložaka mogu se dodavati kroz nasljeđivanje
+	 ili proširenje postojećih komponenti. 
 
 3.  Liskov Substitution Principle - Liskov princip zamjene
-	-U ovom modelu klase Klijent i Uposlenik su izvedene iz klase Osoba.
-	Svaka funkcija u sistemu koja očekuje objekat tipa Osoba (npr. za ispis imena i prezimena)
-	može bez ikakvih problema primiti objekat Klijent ili Uposlenik.
-	-Nasljeđivanje je "čisto" jer podklase ne mijenjaju osnovno ponašanje klase Osoba, 
-	već ga samo dopunjuju specifičnim podacima i metodama.
+	-Svaka buduća izvedena klasa iz Osoba mora moći zamijeniti osnovnu klasu
+	 bez narušavanja rada sistema.
+	-Funkcionalnosti koje koriste objekat tipa Osoba mogu jednako raditi sa bilo kojom
+	 proširenom verzijom te klase.
 
 4. Interface Segregation Principle - Princip izoliranja interfejsa
 	Ovaj princip je zadovoljen kroz odvajanje klasa:
-	-Uposlenik ima atribut Uloga, dok Klijent taj atribut nema.
-	-Klijent je povezan sa Racunom i Predloškom, dok Uposlenik nije direktno vezan 
-	za te entitete.
-	Ovo osigurava da npr. modul za upravljanje platama (koji radi sa uposlenicima) 
-	ne mora znati ništa o predlošcima za uplate koje koriste klijenti.
+	-Osoba nije opterećena logikom računa, transakcija ili kursnih lista.
+	-Račun sadrži samo podatke relevantne za finansijski račun.
+	-Transakcija je fokusirana samo na prenos sredstava.
+	-Predložak služi isključivo za definisanje šablona.
+	-Kurs funkcioniše kao poseban modul za upravljanje valutama.
 
 5. Dependency Inversion Principle - Princip inverzije ovisnosti
 	-Sistem se oslanja na bazičnu klasu AspNetUser (koja dolazi iz frameworka)
-	umjesto da je čvrsto vezan za specifičnu implementaciju korisnika.
+	umjesto da je čvrsto vezan za specifičnu implementaciju osobe.
 	-Zavisnost Transakcija prema klijentima i Klijenta prema Racunu je modelirana
 	tako da su to zasebni entiteti. U implementacionoj fazi, ovo omogućava ubrizgavanje
 	zavisnosti (Dependency Injection) gdje bi servisi radili sa interfejsima (npr. IRacun),
