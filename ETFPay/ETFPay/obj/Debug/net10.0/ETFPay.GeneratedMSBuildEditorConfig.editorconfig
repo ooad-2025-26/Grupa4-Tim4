@@ -42,6 +42,46 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/kemal/Documents/Grupa4-Tim4/ETFPay/ETFPay/Views/Predlozak/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJlZGxvemFrXENyZWF0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/kemal/Documents/Grupa4-Tim4/ETFPay/ETFPay/Views/Predlozak/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJlZGxvemFrXERlbGV0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/kemal/Documents/Grupa4-Tim4/ETFPay/ETFPay/Views/Predlozak/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJlZGxvemFrXERldGFpbHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/kemal/Documents/Grupa4-Tim4/ETFPay/ETFPay/Views/Predlozak/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJlZGxvemFrXEVkaXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/kemal/Documents/Grupa4-Tim4/ETFPay/ETFPay/Views/Predlozak/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJlZGxvemFrXEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/kemal/Documents/Grupa4-Tim4/ETFPay/ETFPay/Views/Racun/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmFjdW5cQ3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/kemal/Documents/Grupa4-Tim4/ETFPay/ETFPay/Views/Racun/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmFjdW5cRGVsZXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/kemal/Documents/Grupa4-Tim4/ETFPay/ETFPay/Views/Racun/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmFjdW5cRGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/kemal/Documents/Grupa4-Tim4/ETFPay/ETFPay/Views/Racun/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmFjdW5cRWRpdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/kemal/Documents/Grupa4-Tim4/ETFPay/ETFPay/Views/Racun/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmFjdW5cSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/kemal/Documents/Grupa4-Tim4/ETFPay/ETFPay/Views/Shared/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
@@ -52,6 +92,26 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/kemal/Documents/Grupa4-Tim4/ETFPay/ETFPay/Views/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/kemal/Documents/Grupa4-Tim4/ETFPay/ETFPay/Views/Transakcija/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVHJhbnNha2NpamFcQ3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/kemal/Documents/Grupa4-Tim4/ETFPay/ETFPay/Views/Transakcija/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVHJhbnNha2NpamFcRGVsZXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/kemal/Documents/Grupa4-Tim4/ETFPay/ETFPay/Views/Transakcija/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVHJhbnNha2NpamFcRGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/kemal/Documents/Grupa4-Tim4/ETFPay/ETFPay/Views/Transakcija/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVHJhbnNha2NpamFcRWRpdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/kemal/Documents/Grupa4-Tim4/ETFPay/ETFPay/Views/Transakcija/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVHJhbnNha2NpamFcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/kemal/Documents/Grupa4-Tim4/ETFPay/ETFPay/Views/_ViewImports.cshtml]
