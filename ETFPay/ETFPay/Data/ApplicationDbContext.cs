@@ -21,5 +21,6 @@ namespace ETFPay.Data
 
             base.OnModelCreating(builder);
         }
+        public DbSet<ETFPay.Models.Kurs> Kurs { get; set; } = default!;
     }
 }
