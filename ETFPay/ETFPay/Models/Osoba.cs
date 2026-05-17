@@ -11,6 +11,6 @@ namespace ETFPay.Models
         public DateOnly DatumRodjenja { get; set; }
         public String Username { get; set; }
         public String BrojTelefona { get; set; }
-        public Uloga Uloga { get; set; }
+      
     }
 }
