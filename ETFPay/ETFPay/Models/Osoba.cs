@@ -9,7 +9,6 @@ namespace ETFPay.Models
         public String Prezime { get; set; }
         public String JMBG { get; set; }
         public DateOnly DatumRodjenja { get; set; }
-        public String Username { get; set; }
         public String BrojTelefona { get; set; }
       
     }

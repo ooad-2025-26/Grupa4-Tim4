@@ -16,7 +16,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ETFPay")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d42963ac84bb18a7c853b600edee0d1aa16b3a1f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8805ff0e28832810f48188746204c8c5c07841c5")]
 [assembly: System.Reflection.AssemblyProductAttribute("ETFPay")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ETFPay")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

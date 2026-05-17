@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Korisnik\\Desktop\\ooad\\ETFPay\\ETFPay\\ETFPay.csproj": {}
+    "C:\\Users\\kemal\\Documents\\Grupa4-Tim4\\ETFPay\\ETFPay\\ETFPay.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Korisnik\\Desktop\\ooad\\ETFPay\\ETFPay\\ETFPay.csproj": {
+    "C:\\Users\\kemal\\Documents\\Grupa4-Tim4\\ETFPay\\ETFPay\\ETFPay.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Korisnik\\Desktop\\ooad\\ETFPay\\ETFPay\\ETFPay.csproj",
+        "projectUniqueName": "C:\\Users\\kemal\\Documents\\Grupa4-Tim4\\ETFPay\\ETFPay\\ETFPay.csproj",
         "projectName": "ETFPay",
-        "projectPath": "C:\\Users\\Korisnik\\Desktop\\ooad\\ETFPay\\ETFPay\\ETFPay.csproj",
-        "packagesPath": "C:\\Users\\Korisnik\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Korisnik\\Desktop\\ooad\\ETFPay\\ETFPay\\obj\\",
+        "projectPath": "C:\\Users\\kemal\\Documents\\Grupa4-Tim4\\ETFPay\\ETFPay\\ETFPay.csproj",
+        "packagesPath": "C:\\Users\\kemal\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\kemal\\Documents\\Grupa4-Tim4\\ETFPay\\ETFPay\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\Korisnik\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\kemal\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -94,7 +94,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.201/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.203/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.AspNetCore": "(,10.0.32767]",
             "Microsoft.AspNetCore.Antiforgery": "(,10.0.32767]",
