@@ -4,3 +4,4 @@ ETFPay/[Oo]bj/
 ETFPay/*.user
 ETFPay/*.suo
 ETFPay/*.shell_navigation_cache
+ETFPay/ETFPay/obj/*
