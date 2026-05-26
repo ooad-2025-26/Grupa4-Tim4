@@ -808,4 +808,4 @@ C:\Users\Korisnik\Desktop\ooad\ETFPay\ETFPay\obj\Debug\net10.0\refint\ETFPay.dll
 C:\Users\Korisnik\Desktop\ooad\ETFPay\ETFPay\obj\Debug\net10.0\ETFPay.pdb
 C:\Users\Korisnik\Desktop\ooad\ETFPay\ETFPay\obj\Debug\net10.0\ETFPay.genruntimeconfig.cache
 C:\Users\Korisnik\Desktop\ooad\ETFPay\ETFPay\obj\Debug\net10.0\ref\ETFPay.dll
-C:\Users\Korisnik\Desktop\ooad\ETFPay\ETFPay\obj\Debug\net10.0\compressed\6evlo6tpwr-{0}-lepnv6wpba-lepnv6wpba.gz
+C:\Users\Korisnik\Desktop\ooad\ETFPay\ETFPay\obj\Debug\net10.0\compressed\6evlo6tpwr-{0}-ss6zm0lglk-ss6zm0lglk.gz

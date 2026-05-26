@@ -107,7 +107,7 @@ public class RegisterModel : PageModel
         public string Prezime { get; set; }
 
         [Required(ErrorMessage = "Broj telefona je obavezan.")]
-        public string BrojTelefona { get; set; }
+        public string PhoneNumber { get; set; }
 
         [Required(ErrorMessage = "JMBG je obavezan.")]
         public string JMBG { get; set; }
@@ -135,7 +135,7 @@ public class RegisterModel : PageModel
          
             user.Ime = Input.Ime;
             user.Prezime = Input.Prezime;
-            user.BrojTelefona = Input.BrojTelefona;
+            user.PhoneNumber = Input.PhoneNumber;
             user.JMBG = Input.JMBG;
             user.DatumRodjenja = DateOnly.FromDateTime(Input.DatumRodjenja);
 
