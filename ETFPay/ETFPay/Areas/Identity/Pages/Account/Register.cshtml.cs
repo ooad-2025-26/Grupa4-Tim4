@@ -30,13 +30,14 @@ public class RegisterModel : PageModel
     private readonly IUserEmailStore<Osoba> _emailStore;
     private readonly ILogger<RegisterModel> _logger;
     private readonly IEmailSender _emailSender;
-
+    private readonly RoleManager<IdentityRole> _roleManager;
     public RegisterModel(
         UserManager<Osoba> userManager,
         IUserStore<Osoba> userStore,
         SignInManager<Osoba> signInManager,
         ILogger<RegisterModel> logger,
-        IEmailSender emailSender)
+        IEmailSender emailSender,
+        RoleManager<IdentityRole> roleManager)
     {
         _userManager = userManager;
         _userStore = userStore;
@@ -44,6 +45,7 @@ public class RegisterModel : PageModel
         _signInManager = signInManager;
         _logger = logger;
         _emailSender = emailSender;
+        _roleManager = roleManager;
     }
 
     /// <summary>
@@ -146,6 +148,15 @@ public class RegisterModel : PageModel
             if (result.Succeeded)
             {
                 _logger.LogInformation("User created a new account with password.");
+
+                string defaultRole = "Client";
+
+                // Provjera postoji li rola u bazi; ako ne postoji, kreira je da kod ne pukne
+                if (!await _roleManager.RoleExistsAsync(defaultRole))
+                {
+                    await _roleManager.CreateAsync(new IdentityRole(defaultRole));
+                }
+                await _userManager.AddToRoleAsync(user, defaultRole);
 
                 var userId = await _userManager.GetUserIdAsync(user);
                 var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);

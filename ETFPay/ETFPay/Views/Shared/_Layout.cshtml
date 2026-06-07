@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var currentController = ViewContext.RouteData.Values["Controller"]?.ToString();
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -36,7 +39,36 @@
                             </li>
                         }
                     </ul>
-                    <partial name="_LoginPartial" />
+
+                    <div class="d-flex align-items-center">
+                        @if (User.Identity.IsAuthenticated && User.IsInRole("Client"))
+                        {
+                            <ul class="navbar-nav me-3 gap-2">
+                                <li class="nav-item">
+                                    <a class="nav-link @(currentController == "Subscriptions" ? "text-primary fw-bold" : "text-dark")"
+                                       asp-controller="Subscriptions" asp-action="Index">Subscriptions</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link @(currentController == "Templates" ? "text-primary fw-bold" : "text-dark")"
+                                       asp-controller="Templates" asp-action="Index">Templates</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link @(currentController == "History" ? "text-primary fw-bold" : "text-dark")"
+                                       asp-controller="History" asp-action="Index">History</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link @(currentController == "Currencies" ? "text-primary fw-bold" : "text-dark")"
+                                       asp-controller="Currencies" asp-action="Index">Currencies</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link @(currentController == "Payment" ? "text-primary fw-bold" : "text-dark")"
+                                       asp-controller="Payment" asp-action="Index">Payment</a>
+                                </li>
+                            </ul>
+                        }
+
+                        <partial name="_LoginPartial" />
+                    </div>
                 </div>
             </div>
         </nav>
@@ -68,6 +100,5 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
-</body>
+    @await RenderSectionAsync("Scripts", required: false)</body>
 </html>

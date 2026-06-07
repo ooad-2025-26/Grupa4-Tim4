@@ -1,0 +1,88 @@
+﻿@model ETFPay.Models.Racun // Pretpostavljam da koristiš model Račun za prikaz ovih podataka
+
+@{
+    ViewData["Title"] = "Klijent Panel";
+}
+
+<style>
+    body {
+        background-color: #f4f7f6;
+    }
+
+    .nav-top {
+        background-color: #ffffff;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+    }
+
+        .nav-top .nav-link {
+            color: #495057;
+            font-weight: 500;
+            padding: 10px 15px;
+            transition: all 0.3s ease;
+        }
+
+            .nav-top .nav-link:hover {
+                color: #0d6efd;
+                background-color: #f8f9fa;
+                border-radius: 5px;
+            }
+
+    .card-racun {
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        color: white;
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 10px 20px rgba(42, 82, 152, 0.25);
+        max-width: 450px;
+        width: 100%;
+    }
+
+    .chip-ikonica {
+        width: 40px;
+        height: 30px;
+        background-color: #ffc107;
+        border-radius: 4px;
+        opacity: 0.8;
+    }
+</style>
+
+
+<div class="container">
+    <div class="d-flex justify-content-center align-items-center" style="min-height: 50vh;">
+
+        <div class="card card-racun p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <span class="fw-bold fs-5 tracking-wide">ETFPAY CARD</span>
+                <div class="chip-ikonica"></div>
+            </div>
+
+            <div class="mb-4">
+                <small class="text-white-50 d-block text-uppercase small" style="font-size: 0.75rem;">Broj računa</small>
+                <span class="fs-4 fw-mono" style="letter-spacing: 2px;">
+                    @(Model != null ? Model.brojRacuna : "1234 - 5678 - 9012 - 3456")
+                </span>
+            </div>
+
+            <div class="mb-4">
+                <small class="text-white-50 d-block text-uppercase small" style="font-size: 0.75rem;">Stanje računa</small>
+                <span class="fs-2 fw-bold">
+                    @(Model != null && !string.IsNullOrEmpty(Model.Stanje) ? decimal.Parse(Model.Stanje).ToString("N2") : "0,00") KM
+                </span>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-end mt-2">
+                <div>
+                    <small class="text-white-50 d-block text-uppercase small" style="font-size: 0.65rem;">Vlasnik računa</small>
+                    <span class="fw-semibold text-uppercase">@User.Identity.Name</span>
+                </div>
+                <div class="text-end">
+                    <small class="text-white-50 d-block text-uppercase small" style="font-size: 0.65rem;">Kreiran (MM/YY)</small>
+                    <span class="fw-semibold">
+                        @(Model != null ? Model.DatumKreiranja.ToString("MM/yy") : DateTime.Now.ToString("MM/yy"))
+                    </span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
