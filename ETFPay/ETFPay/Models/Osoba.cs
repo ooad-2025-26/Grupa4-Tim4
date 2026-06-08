@@ -5,7 +5,7 @@ namespace ETFPay.Models
 {
     public class Osoba : IdentityUser
     {
-        public Osoba() { }
+        public Osoba() {}
 
         public String Ime { get; set; }
         public String Prezime { get; set; }
