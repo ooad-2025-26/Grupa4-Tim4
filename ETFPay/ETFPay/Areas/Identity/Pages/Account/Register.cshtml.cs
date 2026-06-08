@@ -31,13 +31,16 @@ public class RegisterModel : PageModel
     private readonly ILogger<RegisterModel> _logger;
     private readonly IEmailSender _emailSender;
     private readonly RoleManager<IdentityRole> _roleManager;
+    private readonly ApplicationDbContext _context;
+
     public RegisterModel(
         UserManager<Osoba> userManager,
         IUserStore<Osoba> userStore,
         SignInManager<Osoba> signInManager,
         ILogger<RegisterModel> logger,
         IEmailSender emailSender,
-        RoleManager<IdentityRole> roleManager)
+        RoleManager<IdentityRole> roleManager,
+        ApplicationDbContext context)
     {
         _userManager = userManager;
         _userStore = userStore;
@@ -46,6 +49,7 @@ public class RegisterModel : PageModel
         _logger = logger;
         _emailSender = emailSender;
         _roleManager = roleManager;
+        _context = context;
     }
 
     /// <summary>
@@ -158,6 +162,37 @@ public class RegisterModel : PageModel
                 }
                 await _userManager.AddToRoleAsync(user, defaultRole);
 
+                try
+                {
+                    string noviBrojRacuna;
+                    bool zauzet;
+                
+                    do
+                    {
+                        noviBrojRacuna = GenerisiValidanBrojRacuna();
+                        zauzet = _context.Racun.Any(r => r.brojRacuna == noviBrojRacuna);
+                    } while (zauzet);
+                    string noviIban = GenerateValidBosnianIBAN(noviBrojRacuna);
+                    var noviRacun = new Racun
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        brojRacuna = noviBrojRacuna,
+                        IBAN = noviIban,
+                        Stanje = "0.00",
+                        DatumKreiranja = DateOnly.FromDateTime(DateTime.Now),
+                        Aktivan = false
+                    };
+                    _context.Racun.Add(noviRacun);
+                    await _context.SaveChangesAsync();
+                    user.Racun = noviRacun.Id;
+                    await _userManager.UpdateAsync(user);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError($"Greška prilikom kreiranja računa pri registraciji korisnika: {ex.Message}");
+                }
+
+
                 var userId = await _userManager.GetUserIdAsync(user);
                 var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                 code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
@@ -213,4 +248,40 @@ public class RegisterModel : PageModel
         }
         return (IUserEmailStore<Osoba>)_userStore;
     }
+
+    private string GenerisiValidanBrojRacuna()
+    {
+        Random random = new Random();
+        string kodPoslovnice = "000"; // Fiksni kod poslovnice
+
+        string brojKlijenta = "";
+        for (int i = 0; i < 8; i++)
+        {
+            brojKlijenta += random.Next(0, 10).ToString();
+        }
+        string kodBanke = "999"; // nasumicni kod banke u BiH
+        
+        string baza = kodBanke + kodPoslovnice + brojKlijenta;
+        
+        // modulo 97 algoritam za kontrolne cifre
+        long bazaLong = long.Parse(baza) * 100;
+        int ostatak = (int)(bazaLong % 97);
+        int kontrolni = 98 - ostatak;
+
+        return baza + kontrolni.ToString("D2");
+    }
+
+    private string GenerateValidBosnianIBAN(string accountNumber)
+    {
+        
+        // B = 11, A = 10 -> BA00 postaje 111000
+        string broj = accountNumber + "111000";
+        
+        System.Numerics.BigInteger bigNum = System.Numerics.BigInteger.Parse(broj);
+        int ostatak = (int)(bigNum % 97);
+        int controlValue = 98 - ostatak;
+        string kk = controlValue.ToString("D2");
+        return "BA" + kk + accountNumber;
+    }
+
 }

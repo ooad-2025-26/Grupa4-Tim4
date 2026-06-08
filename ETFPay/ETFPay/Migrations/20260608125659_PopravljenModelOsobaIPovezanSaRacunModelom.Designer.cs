@@ -4,6 +4,7 @@ using ETFPay.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ETFPay.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260608125659_PopravljenModelOsobaIPovezanSaRacunModelom")]
+    partial class PopravljenModelOsobaIPovezanSaRacunModelom
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -194,7 +197,7 @@ namespace ETFPay.Migrations
 
                     b.Property<string>("IBAN")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Stanje")
                         .IsRequired()
@@ -202,15 +205,9 @@ namespace ETFPay.Migrations
 
                     b.Property<string>("brojRacuna")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("IBAN")
-                        .IsUnique();
-
-                    b.HasIndex("brojRacuna")
-                        .IsUnique();
 
                     b.ToTable("Racun", (string)null);
                 });

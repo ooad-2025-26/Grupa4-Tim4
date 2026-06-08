@@ -24,6 +24,11 @@ namespace ETFPay.Data
             builder.Entity<Transakcija>().ToTable("Transakcija");
             builder.Entity<Predlozak>().ToTable("Predlozak");
             builder.Entity<Kurs>().ToTable("Kurs");
+
+            builder.Entity<Osoba>()
+                .HasOne(o => o.RacunKorisnika)
+                .WithOne(r => r.Osoba)
+                .HasForeignKey<Osoba>(o => o.Racun);
         }
     }
 }
