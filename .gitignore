@@ -1,7 +1,9 @@
-ETFPay/.vs/
-ETFPay/[Bb]in/
-ETFPay/[Oo]bj/
-ETFPay/*.user
-ETFPay/*.suo
-ETFPay/*.shell_navigation_cache
-ETFPay/ETFPay/obj/*
+[Bb]in/
+[Oo]bj/
+
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.shell_navigation_cache
