@@ -7,151 +7,100 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ETFPay.Data;
 using ETFPay.Models;
+using ETFPay.Services;
 
 namespace ETFPay.Controllers
 {
     public class KursController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly KursService _kursService;
 
-        public KursController(ApplicationDbContext context)
+        private readonly string[] AktuelneValute = {
+            "EUR", "AUD", "CAD", "CZK", "DKK", "HUF", "JPY", "NOK",
+            "SEK", "CHF", "TRY", "GBP", "USD", "RUB", "CNY", "RSD"
+        };
+
+        public KursController(KursService kursService)
         {
-            _context = context;
+            _kursService = kursService;
         }
 
-        // GET: Kurs
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? iz, string? u, double? iznos, string? pretraga)
         {
-            return View(await _context.Kurs.ToListAsync());
+            var kursnaLista = await _kursService.DobaviKursnuListu("BAM");
+
+            if (kursnaLista == null) kursnaLista = new List<Models.Kurs>();
+
+            var aktuelneValute = new List<string> {
+                "EUR", "AUD", "CAD", "CZK", "DKK", "HUF", "JPY", "NOK",
+                "SEK", "CHF", "TRY", "GBP", "USD", "RUB", "CNY", "RSD"
+            };
+
+            if (kursnaLista != null && !string.IsNullOrEmpty(pretraga))
+            {
+                string kraticaZaPretragu = pretraga.Trim().ToUpper();
+
+                ViewBag.RezultatPretrage = kursnaLista
+                    .FirstOrDefault(k => k.CiljanaValuta.ToUpper() == kraticaZaPretragu);
+
+                ViewBag.Pretraga = pretraga;
+            }
+            else
+            {
+                ViewBag.RezultatPretrage = null;
+            }
+
+            ViewBag.NaziviValuta = kursnaLista.ToDictionary(
+                k => k.CiljanaValuta.ToUpper(),
+                k => DajPuniNazivValute(k.CiljanaValuta)
+            );
+
+            if (iznos.HasValue && iznos > 0)
+            {
+                double rezultat = await _kursService.KonvertujIznos(iz, u, (double)iznos);
+
+                ViewBag.Rezultat = Math.Floor(rezultat * 10000) / 10000;
+                ViewBag.Iznos = iznos;
+                ViewBag.Iz = iz;
+                ViewBag.U = u;
+            }
+            else
+            {
+                ViewBag.Rezultat = "";
+                ViewBag.Iznos = 1;
+                ViewBag.Iz = "BAM";
+                ViewBag.U = "EUR";
+            }
+
+            var filtriranaListaZaView = kursnaLista
+                .Where(k => aktuelneValute.Contains(k.CiljanaValuta.ToUpper()))
+                .ToList();
+
+            return View(filtriranaListaZaView);
         }
 
-        // GET: Kurs/Details/5
-        public async Task<IActionResult> Details(int? id)
+        private static string DajPuniNazivValute(string kodValute)
         {
-            if (id == null)
+            return kodValute.ToUpper() switch
             {
-                return NotFound();
-            }
-
-            var kurs = await _context.Kurs
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (kurs == null)
-            {
-                return NotFound();
-            }
-
-            return View(kurs);
-        }
-
-        // GET: Kurs/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Kurs/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Valuta,IznosZaJedanUSD,VrijemeAzuriranja")] Kurs kurs)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(kurs);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(kurs);
-        }
-
-        // GET: Kurs/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var kurs = await _context.Kurs.FindAsync(id);
-            if (kurs == null)
-            {
-                return NotFound();
-            }
-            return View(kurs);
-        }
-
-        // POST: Kurs/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Valuta,IznosZaJedanUSD,VrijemeAzuriranja")] Kurs kurs)
-        {
-            if (id != kurs.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(kurs);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!KursExists(kurs.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(kurs);
-        }
-
-        // GET: Kurs/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var kurs = await _context.Kurs
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (kurs == null)
-            {
-                return NotFound();
-            }
-
-            return View(kurs);
-        }
-
-        // POST: Kurs/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var kurs = await _context.Kurs.FindAsync(id);
-            if (kurs != null)
-            {
-                _context.Kurs.Remove(kurs);
-            }
-
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool KursExists(int id)
-        {
-            return _context.Kurs.Any(e => e.Id == id);
+                "EUR" => "Euro",
+                "AUD" => "Australijski dolar",
+                "CAD" => "Kanadski dolar",
+                "CZK" => "Češka kruna",
+                "DKK" => "Danska kruna",
+                "HUF" => "Mađarska forinta",
+                "JPY" => "Japanski jen",
+                "NOK" => "Norveška kruna",
+                "SEK" => "Švedska kruna",
+                "CHF" => "Švicarski franak",
+                "TRY" => "Turska lira",
+                "GBP" => "Britanska funta",
+                "USD" => "Američki dolar",
+                "RUB" => "Ruska rublja",
+                "CNY" => "Kineski juan",
+                "RSD" => "Srpski dinar",
+                _ => ""
+            };
         }
     }
 }
