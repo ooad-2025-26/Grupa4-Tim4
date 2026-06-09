@@ -2,6 +2,8 @@ html {
   font-size: 14px;
 }
 
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap');
+
 @media (min-width: 768px) {
   html {
     font-size: 16px;
@@ -16,10 +18,159 @@ html {
   position: relative;
   min-height: 100%;
 }
+:root {
+  --primary: #1f6b60;
+  --primary-dark: #164d43;
+  --wave-height: 220px;
+  --muted: #6c757d;
+}
+
 body {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    background-attachment: fixed;
+    background: #ffffff;
+    color: #163f38;
     min-height: 100vh;
+    position: relative;
+    font-family: 'Poppins', "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    overflow-x: hidden;
+}
+
+/* detalj na dnu ekrana (onaj zeleni val) */
+body::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--wave-height);
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320' preserveAspectRatio='none'><path fill='%231f6b60' d='M0,160L48,165.3C96,171,192,181,288,176C384,171,480,149,576,144C672,139,768,149,864,165.3C960,181,1056,203,1152,208C1248,213,1344,203,1392,197.3L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'></path></svg>") no-repeat bottom / cover;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* hero area da stvari budu iznad vala */
+.hero {
+  position: relative;
+  z-index: 1;
+  padding: 6rem 1rem calc(var(--wave-height) + 3rem);
+  text-align: center;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 6vw, 4.5rem);
+  color: var(--primary);
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+
+.hero .divider {
+  width: 160px;
+  height: 3px;
+  background: var(--primary);
+  margin: 0.75rem auto 2rem;
+  border-radius: 2px;
+}
+
+.btn-primary, .btn.etf-btn {
+  background: var(--primary);
+  border: 2px solid #ffffff;
+  color: #ffffff;
+  border-radius: 50px;
+  padding: 0.6rem 2.2rem;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.06);
+}
+.btn-primary:hover {
+  background: var(--primary-dark);
+  color: #fff;
+}
+
+.navbar .nav-link,
+.nav-link {
+  color: #000000;
+  font-weight: 600;
+}
+
+.navbar-brand .logo, img.logo {
+  height: 46px;
+  margin-right: 12px;
+}
+.navbar-brand img {
+  display: inline-block;
+}
+.brand-text {
+  margin-left: 8px;
+  font-weight: 700;
+  color: #163f38;
+  font-size: 1.25rem;
+}
+
+.rates {
+  max-width: 520px;
+}
+.rates .rate-row {
+  display: grid;
+  grid-template-columns: 90px 1fr 90px;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.6rem 0.75rem;
+  font-size: 1.05rem;
+}
+.rates .rate-row + .rate-row {
+  margin-top: 0.35rem;
+}
+.rates .code {
+  font-weight: 700;
+  font-size: 1.15rem;
+}
+.rates .name {
+  color: #0f2f2b;
+}
+.rates .value {
+  text-align: right;
+  font-weight: 600;
+}
+.rates .rate-row.active {
+  background: var(--primary);
+  color: #fff;
+  border-radius: 12px;
+  padding: 0.6rem 1rem;
+}
+.rates .rate-row.active .name,
+.rates .rate-row.active .value {
+  color: #fff;
+}
+
+.conversion {
+  max-width: 520px;
+}
+.conversion .form-control,
+.conversion input[type="text"],
+.conversion input[type="number"] {
+  border-radius: 10px;
+  border: 1.5px solid #d9d9d9;
+  padding: 0.9rem 1rem;
+  box-shadow: none;
+  background: #ffffff;
+}
+.conversion .form-control:focus,
+.conversion input[type="text"]:focus,
+.conversion input[type="number"]:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 0.12rem rgba(31,107,96,0.12);
+}
+.conversion .result {
+  background: #f3f3f3;
+  border-radius: 8px;
+  padding: 0.9rem 1rem;
+}
+
+.form-center {
+  max-width: 680px;
+  margin: 0 auto 2.5rem;
+}
+
+.btn-primary, .btn.etf-btn {
+  border: 2px solid #ffffff;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.06), inset 0 0 0 2px rgba(255,255,255,0.06);
 }
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
   color: var(--bs-secondary-color);

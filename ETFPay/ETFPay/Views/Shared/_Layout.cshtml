@@ -16,7 +16,12 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">ETFPay</a>
+                <a class="navbar-brand d-flex align-items-center" asp-area="" asp-controller="Home" asp-action="Index" aria-label="ETFPay home">
+                    <picture>
+                        <source srcset="~/images/logo.png" type="image/png" />
+                        <img src="~/images/logo.svg" alt="ETFPay" style="height:48px; margin-right:0.5rem;" />
+                    </picture>
+                </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -36,6 +41,12 @@
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">User Search</a>
+                            </li>
+                        }
+                        @if (User.IsInRole("Uposlenik"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Osoba" asp-action="ZahtjeviZaRacun">Zahtjevi za Račun</a>
                             </li>
                         }
                     </ul>

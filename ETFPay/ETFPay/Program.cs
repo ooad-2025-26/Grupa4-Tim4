@@ -39,26 +39,51 @@ using (var scope = app.Services.CreateScope())
 
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<Osoba>>();
 
-    string adminEmail = "dzevica1@gmail.com";
-    string adminPassword = "Dzevo123.";
+    string adminEmail = "admin@etfpay.com";
+    string adminPassword = "Admin-123";
 
     var adminUser = await userManager.FindByEmailAsync(adminEmail);
 
     if (adminUser == null)
     {
         var user = new Osoba
-        {   Ime="DzevoN",
-            Prezime="Zej",
-            JMBG="23687527372",
+        {
+            Ime = "Omer",
+            Prezime = "Meslasa",
+            JMBG = "23687527372",
             UserName = adminEmail,
             Email = adminEmail,
             EmailConfirmed = true
-        
-
         };
 
-        await userManager.CreateAsync(user, adminPassword);
-        await userManager.AddToRoleAsync(user, "Admin");
+        var result = await userManager.CreateAsync(user, adminPassword);
+
+        if (result.Succeeded)
+        {
+            Console.WriteLine("Korisnik uspješno kreiran.");
+
+            var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            dbContext.ChangeTracker.Clear(); 
+            var adminNovi = await userManager.FindByEmailAsync(adminEmail);
+
+            if (adminNovi != null)
+            {
+                var rez = await userManager.AddToRoleAsync(adminNovi, "Admin");
+
+                if (rez.Succeeded)
+                {
+                    Console.WriteLine("Uloga uspješno dodijeljena adminu");
+                }
+                else
+                {
+                    Console.WriteLine("Greška pri dodjeli uloge adminu");
+                }
+            }
+        }
+        else
+        {
+            Console.WriteLine("Kreiranje admina nije uspjelo:");
+        }
     }
 
 }
