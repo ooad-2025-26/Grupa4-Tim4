@@ -1,5 +1,6 @@
 using ETFPay.Data;
 using ETFPay.Models;
+using ETFPay.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,6 +20,8 @@ builder.Services.AddDefaultIdentity<Osoba>()
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+
+builder.Services.AddHttpClient<KursService>();
 
 var app = builder.Build();
 
