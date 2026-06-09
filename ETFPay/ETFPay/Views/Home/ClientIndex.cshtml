@@ -2,6 +2,9 @@
 
 @{
     ViewData["Title"] = "Klijent Panel";
+    var racunAktivan = (bool)(ViewBag.RacunAktivan??false);
+    var racun = ViewBag.Racun as ETFPay.Models.Racun;
+    var transakcije = ViewBag.ZadnjeTransakcije as List<ETFPay.Models.Transakcija> ?? new();
 }
 
 <style>
@@ -46,43 +49,77 @@
     }
 </style>
 
-
 <div class="container">
-    <div class="d-flex justify-content-center align-items-center" style="min-height: 50vh;">
-
-        <div class="card card-racun p-4">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <span class="fw-bold fs-5 tracking-wide">ETFPAY CARD</span>
-                <div class="chip-ikonica"></div>
-            </div>
-
-            <div class="mb-4">
-                <small class="text-white-50 d-block text-uppercase small" style="font-size: 0.75rem;">Broj računa</small>
-                <span class="fs-4 fw-mono" style="letter-spacing: 2px;">
-                    @(Model != null ? Model.brojRacuna : "1234 - 5678 - 9012 - 3456")
-                </span>
-            </div>
-
-            <div class="mb-4">
-                <small class="text-white-50 d-block text-uppercase small" style="font-size: 0.75rem;">Stanje računa</small>
-                <span class="fs-2 fw-bold">
-                    @(Model != null && !string.IsNullOrEmpty(Model.Stanje) ? decimal.Parse(Model.Stanje).ToString("N2") : "0,00") KM
-                </span>
-            </div>
-
-            <div class="d-flex justify-content-between align-items-end mt-2">
-                <div>
-                    <small class="text-white-50 d-block text-uppercase small" style="font-size: 0.65rem;">Vlasnik računa</small>
-                    <span class="fw-semibold text-uppercase">@User.Identity.Name</span>
-                </div>
-                <div class="text-end">
-                    <small class="text-white-50 d-block text-uppercase small" style="font-size: 0.65rem;">Kreiran (MM/YY)</small>
-                    <span class="fw-semibold">
-                        @(Model != null ? Model.DatumKreiranja.ToString("MM/yy") : DateTime.Now.ToString("MM/yy"))
-                    </span>
-                </div>
+    @if (!racunAktivan)
+    {
+        <div class="d-flex justify-content-center align-items-center" style="min-height: 50vh;">
+            <div class="alert alert-warning text-center shadow-sm" style="max-width: 500px;">
+                <h5 class="alert-heading mb-3">Račun nije aktiviran</h5>
+                <p class="mb-0">Morate otići u poslovnicu za aktiviranje računa.</p>
             </div>
         </div>
+    }
+    else
+    {
+        <div class="d-flex flex-column align-items-center py-4">
+            <div class="card card-racun p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <span class="fw-bold fs-5 tracking-wide">ETFPAY CARD</span>
+                    <div class="chip-ikonica"></div>
+                </div>
 
-    </div>
+                <div class="mb-4">
+                    <small class="text-white-50 d-block text-uppercase small" style="font-size: 0.75rem;">Broj računa</small>
+                    <span class="fs-4 fw-mono" style="letter-spacing: 2px;">@racun!.brojRacuna</span>
+                </div>
+
+                <div class="mb-4">
+                    <small class="text-white-50 d-block text-uppercase small" style="font-size: 0.75rem;">Stanje računa</small>
+                    <span class="fs-2 fw-bold">@(decimal.Parse(racun.Stanje).ToString("N2")) KM</span>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-end mt-2">
+                    <div>
+                        <small class="text-white-50 d-block text-uppercase small" style="font-size: 0.65rem;">Vlasnik računa</small>
+                        <span class="fw-semibold text-uppercase">@User.Identity!.Name</span>
+                    </div>
+                    <div class="text-end">
+                        <small class="text-white-50 d-block text-uppercase small" style="font-size: 0.65rem;">Kreiran (MM/YY)</small>
+                        <span class="fw-semibold">@racun.DatumKreiranja.ToString("MM/yy")</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4" style="max-width: 450px; width: 100%;">
+                <h6 class="text-muted text-uppercase mb-3" style="font-size: 0.75rem; letter-spacing: 1px;">
+                    Zadnje transakcije
+                </h6>
+
+                @if (transakcije.Any())
+                {
+                    <div class="list-group shadow-sm">
+                        @foreach (var t in transakcije)
+                        {
+                            var jeUlazna = t.Primaoc == racun.Id;
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="fw-semibold">@(jeUlazna ? "Uplata" : "Isplata")</div>
+                                    <small class="text-muted">@t.VrijemeTransakcije.ToString("dd.MM.yyyy HH:mm")</small>
+                                </div>
+                                <span class="fw-bold @(jeUlazna ? "text-success" : "text-danger")">
+                                    @(jeUlazna ? "+" : "-")@t.Iznos.ToString("N2") KM
+                                </span>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center text-muted py-3 border rounded bg-white shadow-sm">
+                        Nema transakcija za prikazati.
+                    </div>
+                }
+            </div>
+        </div>
+    }
 </div>
