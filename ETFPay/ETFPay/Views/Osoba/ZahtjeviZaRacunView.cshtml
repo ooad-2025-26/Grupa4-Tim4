@@ -1,5 +1,127 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model List<ETFPay.Models.Osoba>
+
 @{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Zahtjevi za Račun";
 }
+
+<style>
+    body {
+        background-color: #f4f7f6;
+    }
+
+    .zrequests { display: flex; gap: 40px; padding: 30px; }
+    .z-left { width: 45%; }
+    .z-right { width: 45%; }
+    .z-title { font-size: 32px; font-weight: 800; margin-bottom: 18px; }
+    .list-header { display: flex; justify-content: space-between; margin-bottom: 10px; font-weight: 600; }
+    .clients { background: #f2f2f2; padding: 12px; border-radius: 10px; max-height: 380px; overflow: auto; }
+    .client-item { display: flex; justify-content: space-between; align-items: center; background: #e9e9e9; padding: 12px; margin: 8px 0; border-radius: 10px; cursor: pointer; border: none; font-size: inherit; text-align: left; width: 100%; transition: background-color 0.2s; }
+    .client-item:hover { background: #d0d0d0; }
+    .client-item.selected { background: #1f7a66; color: white; }
+    .client-item .status { background: transparent; padding: 6px 12px; border-radius: 8px; }
+    .btn-green { background: #1f7a66; color: white; border: none; padding: 12px 26px; border-radius: 10px; font-weight: 700; cursor: pointer; }
+    .btn-small { background: #1f7a66; color: white; border: none; padding: 8px 16px; border-radius: 10px; cursor: pointer; }
+    .details { padding: 18px; border-radius: 8px; }
+    .detail-row { display: flex; align-items: center; margin: 12px 0; }
+    .detail-row label { width: 140px; }
+    .detail-row input { flex: 1; padding: 8px 12px; border-radius: 10px; border: 1px solid #ccc; }
+    .name-badge { text-align: center; margin-bottom: 18px; }
+    .name-badge .name { display: inline-block; padding: 12px 30px; border-radius: 10px; background: #1f7a66; color: white; font-size: 22px; font-weight: 800; }
+</style>
+
+<div class="hero">
+    <div class="container">
+        <div class="zrequests">
+            <div class="z-left">
+                <div class="z-title">ZAHTJEVI ZA RAČUN</div>
+                <div class="list-header">
+                    <div>Klijent</div>
+                    <div>Status</div>
+                </div>
+
+                <div class="clients">
+                    @if (Model != null && Model.Count > 0)
+                    {
+                        @foreach (var osoba in Model)
+                        {
+                            <form method="get" asp-action="ZahtjeviZaRacun" style="display: contents;">
+                                <button type="submit" name="selectedUserId" value="@osoba.Id" class="client-item @(ViewData["SelectedUserId"]?.ToString() == osoba.Id ? "selected" : "")">
+                                    <div class="name">@osoba.Ime @osoba.Prezime</div>
+                                    <div class="status">Neobrađen</div>
+                                </button>
+                            </form>
+                        }
+                    }
+                    else
+                    {
+                        <div style="padding: 20px; text-align: center; color: #666;">
+                            Nema zahtjeva za račun
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="z-right">
+                <div class="name-badge">
+                    <span class="name" id="detailName">
+                        @if (ViewData["SelectedUser"] is ETFPay.Models.Osoba selectedUser)
+                        {
+                            @selectedUser.Ime @selectedUser.Prezime
+                        }
+                        else
+                        {
+                            <text>Odaberite klijenta</text>
+                        }
+                    </span>
+                </div>
+
+                @if (ViewData["SelectedUser"] is ETFPay.Models.Osoba user)
+                {
+                    <div class="details card">
+                        <div class="detail-row">
+                            <label>JMBG</label>
+                            <input value="@user.JMBG" readonly />
+                        </div>
+                        <div class="detail-row">
+                            <label>Datum rođenja</label>
+                            <input value="@user.DatumRodjenja.ToString("dd.MM.yyyy")" readonly />
+                        </div>
+                        <div class="detail-row">
+                            <label>Email</label>
+                            <input value="@user.Email" readonly />
+                        </div>
+                        <div class="detail-row">
+                            <label>Broj telefona</label>
+                            <input value="@user.PhoneNumber" readonly />
+                        </div>
+                        <div class="detail-row">
+                            <label>Username</label>
+                            <input value="@user.UserName" readonly />
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 20px; text-align: center;">
+                        <form method="post" asp-action="ProcessZahtjev">
+                            <input type="hidden" name="userId" value="@user.Id" />
+                            <button type="submit" class="btn-green" name="action" value="approve">POTVRDI</button>
+                        </form>
+                    </div>
+
+                    <div style="margin-top: 18px;">
+                        <form method="post" asp-action="ProcessZahtjev">
+                            <input type="hidden" name="userId" value="@user.Id" />
+                            <button type="submit" class="btn-small" name="action" value="delete" onclick="return confirm('Jeste li sigurni da želite obrisati ovaj zahtjev?');">OBRIŠI</button>
+                        </form>
+                    </div>
+                }
+                else
+                {
+                    <div class="details card" style="color: #999; text-align: center; padding: 40px;">
+                        Odaberite klijenta da vidite detaljne informacije
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
