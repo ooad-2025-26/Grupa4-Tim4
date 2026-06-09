@@ -7,7 +7,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ETFPay.Data;
 using ETFPay.Models;
-
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 namespace ETFPay.Controllers
 {
     public class TransakcijaController : Controller
@@ -54,7 +55,7 @@ namespace ETFPay.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Primaoc,Posiljaoc,Iznos,VrijemeTransakcije")] Transakcija transakcija)
+        public async Task<IActionResult> Create([Bind("Id,Primaoc,Posiljaoc,Iznos,VrijemeTransakcije,SvrhaUplate")] Transakcija transakcija)
         {
             if (ModelState.IsValid)
             {
@@ -86,7 +87,7 @@ namespace ETFPay.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("Id,Primaoc,Posiljaoc,Iznos,VrijemeTransakcije")] Transakcija transakcija)
+        public async Task<IActionResult> Edit(string id, [Bind("Id,Primaoc,Posiljaoc,Iznos,VrijemeTransakcije,SvrhaUplate")] Transakcija transakcija)
         {
             if (id != transakcija.Id)
             {
@@ -152,6 +153,27 @@ namespace ETFPay.Controllers
         private bool TransakcijaExists(string id)
         {
             return _context.Transakcija.Any(e => e.Id == id);
+        }
+
+        [Authorize(Roles = "Client")]
+        public async Task<IActionResult> MojeTransakcije(string? id, [FromServices] UserManager<Osoba> userManager)
+        {
+
+            var user = await userManager.GetUserAsync(User);
+            if (user == null || string.IsNullOrEmpty(user.Racun)) return RedirectToAction("ClientIndex", "Home");
+            var racun = await _context.Racun.FindAsync(user.Racun);
+            if (racun == null) return RedirectToAction("ClientIndex", "Home");
+            var transakcije = await _context.Transakcija.Where(t => t.Primaoc == user.Racun || t.Posiljaoc == user.Racun).
+                OrderByDescending(t => t.VrijemeTransakcije).ToListAsync();
+            return View(new TransakcijeViewModel
+            {
+                Transakcije = transakcije,
+                Odabrana = !string.IsNullOrEmpty(id) ? transakcije.FirstOrDefault(t => t.Id == id) : transakcije.FirstOrDefault(),
+                BrojRacunaKorisnika = racun.brojRacuna,
+                RacunIdKorisnika = user.Racun
+            });
+
+
         }
     }
 }

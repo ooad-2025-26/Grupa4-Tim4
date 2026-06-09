@@ -1,0 +1,79 @@
+﻿@model ETFPay.Models.TransakcijeViewModel
+@{
+    ViewData["Title"] = "History";
+    var odabrana = Model.Odabrana;
+    var i = 0;
+}
+
+<div class="hero">
+    <div class="container">
+        <h1>HISTORIJA TRANSAKCIJA</h1>
+        <div class="divider"></div>
+
+        <div class="row g-4 justify-content-center">
+            <div class="col-lg-5">
+                <div class="rates mx-auto">
+                    <div class="rate-row fw-bold" style="pointer-events:none">
+                        <span class="code"></span>
+                        <span class="name">Transakcije</span>
+                        <span class="value">Iznos</span>
+                    </div>
+
+                    @if (!Model.Transakcije.Any())
+                    {
+                        <p class="text-muted mt-3">Nemate transakcija.</p>
+                    }
+
+                    @foreach (var t in Model.Transakcije)
+                    {
+                        i++;
+                        var plus = t.Primaoc == Model.RacunIdKorisnika;
+                        <a asp-action="MojeTransakcije" asp-route-id="@t.Id"
+                           class="rate-row text-decoration-none @(odabrana?.Id == t.Id ? "active" : "")">
+                            <span class="code"></span>
+                            <span class="name">Transakcija @i</span>
+                            <span class="value">@(plus ? "+" : "-")@t.Iznos.ToString("N2") KM</span>
+                        </a>
+                    }
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                @if (odabrana != null)
+                {
+                    var idx = Model.Transakcije.FindIndex(t => t.Id == odabrana.Id) + 1;
+                    var plus = odabrana.Primaoc == Model.RacunIdKorisnika;
+                    <div class="conversion mx-auto">
+                        <div class="rate-row active mb-3" style="pointer-events:none">
+                            <span class="code"></span>
+                            <span class="name">TRANSAKCIJA @idx</span>
+                            <span class="value"></span>
+                        </div>
+                        <div class="d-flex justify-content-between py-2 border-bottom">
+                            <span>Broj računa</span>
+                            <span class="fw-semibold">@Model.BrojRacunaKorisnika</span>
+                        </div>
+                        <div class="d-flex justify-content-between py-2 border-bottom">
+                            <span>Iznos</span>
+                            <span class="fw-semibold">@(plus ? "+" : "-")@odabrana.Iznos.ToString("N2") KM</span>
+                        </div>
+                        <div class="d-flex justify-content-between py-2 border-bottom">
+                            <span>Svrha uplate</span>
+                            <span class="fw-semibold">@(string.IsNullOrEmpty(odabrana.SvrhaUplate) ? "-" : odabrana.SvrhaUplate)</span>
+                        </div>
+                        <div class="d-flex justify-content-between py-2">
+                            <span>Datum transakcije</span>
+                            <span class="fw-semibold">@odabrana.VrijemeTransakcije.ToString("dd/MM/yyyy")</span>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="conversion mx-auto">
+                        <p class="text-muted mb-0">Odaberite transakciju.</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

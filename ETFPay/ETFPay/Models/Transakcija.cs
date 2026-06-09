@@ -15,5 +15,6 @@ namespace ETFPay.Models
         public String Posiljaoc { get; set; }
         public Double Iznos { get; set; }
         public DateTime VrijemeTransakcije { get; set; }
+        public string? SvrhaUplate { get; set; }
     }
 }
