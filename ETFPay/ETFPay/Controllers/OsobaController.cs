@@ -16,7 +16,7 @@ namespace ETFPay.Controllers
             _context = context;
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Uposlenik")]
         public async Task<IActionResult> ZahtjeviZaRacun(string? selectedUserId = null)
         {
             var zahtjevi = await _context.Users
@@ -35,7 +35,7 @@ namespace ETFPay.Controllers
             return View("ZahtjeviZaRacunView", zahtjevi);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Uposlenik")]
         [HttpPost]
         public async Task<IActionResult> ProcessZahtjev(string userId, string action)
         {
