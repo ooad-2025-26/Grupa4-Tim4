@@ -185,7 +185,7 @@ public class RegisterModel : PageModel
                         Id = Guid.NewGuid().ToString(),
                         brojRacuna = noviBrojRacuna,
                         IBAN = noviIban,
-                        Stanje = "0.00",
+                        Stanje = 0.00,
                         DatumKreiranja = DateOnly.FromDateTime(DateTime.Now),
                         Aktivan = false
                     };
