@@ -1,5 +1,11 @@
 ﻿@{
     var currentController = ViewContext.RouteData.Values["Controller"]?.ToString();
+    var currentAction = ViewContext.RouteData.Values["Action"]?.ToString();
+    var isPretplate = currentController == "Predlozak" && (currentAction == "PretplataView" || currentAction == "DodavanjePretplate");
+    var isPredlosci = currentController == "Predlozak" && (currentAction == "PredlozakView" || currentAction == "DodavanjePredlozaka");
+    var isHistory = currentController == "Transakcija" && currentAction == "MojeTransakcije";
+    var isCurrencies = currentController == "Kurs";
+    var isPayment = currentController == "Transakcija" && currentAction == "Transakcija";
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -56,23 +62,23 @@
                         {
                             <ul class="navbar-nav me-3 gap-2">
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark"
+                                    <a class="nav-link @(isPretplate ? "nav-link-active" : "text-dark")"
                                        asp-controller="Predlozak" asp-action="PretplataView">PRETPLATE</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark"
+                                    <a class="nav-link @(isPredlosci ? "nav-link-active" : "text-dark")"
                                        asp-controller="Predlozak" asp-action="PredlozakView">PREDLOSCI</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark"
+                                    <a class="nav-link @(isHistory ? "nav-link-active" : "text-dark")"
                                        asp-controller="Transakcija" asp-action="MojeTransakcije">History</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link @(currentController == "Currencies" ? "text-primary fw-bold" : "text-dark")"
-                                       asp-controller="Currencies" asp-action="Index">Currencies</a>
+                                    <a class="nav-link @(isCurrencies ? "nav-link-active" : "text-dark")"
+                                       asp-controller="Kurs" asp-action="Index">Currencies</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link @(currentController == "Transakcija" ? "text-primary fw-bold" : "text-dark")"
+                                    <a class="nav-link @(isPayment ? "nav-link-active" : "text-dark")"
                                        asp-controller="Transakcija"
                                        asp-action="Transakcija">
                                         Payment

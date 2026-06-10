@@ -1,22 +1,14 @@
 ﻿using ETFPay.Data;
 using ETFPay.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using ETFPay.Data;
-using ETFPay.Models;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace ETFPay.Controllers
 {
-    [Authorize(Roles ="Admin,Uposlenik")]
     public class TransakcijaController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -25,17 +17,20 @@ namespace ETFPay.Controllers
         {
             _context = context;
         }
+        [Authorize(Roles = "Client")]
         public IActionResult Transakcija()
         {
             return View();
         }
         // GET: Transakcija
+        [Authorize(Roles = "Admin,Uposlenik")]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Transakcija.ToListAsync());
         }
 
         // GET: Transakcija/Details/5
+        [Authorize(Roles = "Admin,Uposlenik")]
         public async Task<IActionResult> Details(string id)
         {
             if (id == null)
@@ -54,6 +49,7 @@ namespace ETFPay.Controllers
         }
 
         // GET: Transakcija/Create
+        [Authorize(Roles = "Admin,Uposlenik")]
         public IActionResult Create()
         {
             return View();
@@ -64,6 +60,7 @@ namespace ETFPay.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Uposlenik")]
         public async Task<IActionResult> Create([Bind("Id,Primaoc,Posiljaoc,Iznos,VrijemeTransakcije,SvrhaUplate")] Transakcija transakcija)
         {
             if (ModelState.IsValid)
@@ -76,6 +73,7 @@ namespace ETFPay.Controllers
         }
 
         // GET: Transakcija/Edit/5
+        [Authorize(Roles = "Admin,Uposlenik")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null)
@@ -96,6 +94,7 @@ namespace ETFPay.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Uposlenik")]
         public async Task<IActionResult> Edit(string id, [Bind("Id,Primaoc,Posiljaoc,Iznos,VrijemeTransakcije,SvrhaUplate")] Transakcija transakcija)
         {
             if (id != transakcija.Id)
@@ -127,6 +126,7 @@ namespace ETFPay.Controllers
         }
 
         // GET: Transakcija/Delete/5
+        [Authorize(Roles = "Admin,Uposlenik")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null)
@@ -147,6 +147,7 @@ namespace ETFPay.Controllers
         // POST: Transakcija/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Uposlenik")]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             var transakcija = await _context.Transakcija.FindAsync(id);
@@ -167,7 +168,6 @@ namespace ETFPay.Controllers
         [Authorize(Roles = "Client")]
         public async Task<IActionResult> MojeTransakcije(string? id, [FromServices] UserManager<Osoba> userManager)
         {
-
             var user = await userManager.GetUserAsync(User);
             if (user == null || string.IsNullOrEmpty(user.Racun)) return RedirectToAction("ClientIndex", "Home");
             var brojRacuna = await _context.Racun
@@ -187,8 +187,64 @@ namespace ETFPay.Controllers
                 BrojRacunaKorisnika = brojRacuna,
                 RacunIdKorisnika = user.Racun
             });
+        }
 
+        public class CreateTransactionRequest
+        {
+            public string RecipientAccountNumber { get; set; } = "";
+            public double Amount { get; set; }
+            public string? Purpose { get; set; }
+        }
 
+        [HttpPost]
+        [Authorize(Roles = "Client")]
+        public async Task<IActionResult> CreateTransaction(CreateTransactionRequest request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            var sender = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId);
+            if (sender == null || string.IsNullOrEmpty(sender.Racun))
+                return Unauthorized();
+
+            if (request.Amount <= 0)
+                return BadRequest("Amount must be greater than 0");
+
+            var senderAccount = await _context.Racun
+                .FirstOrDefaultAsync(r => r.Id == sender.Racun);
+
+            if (senderAccount == null)
+                return BadRequest("Sender account not found");
+
+            var recipientAccount = await _context.Racun
+                .FirstOrDefaultAsync(a => a.brojRacuna == request.RecipientAccountNumber);
+
+            if (recipientAccount == null)
+                return BadRequest("Recipient account not found");
+
+            if (senderAccount.Stanje < request.Amount)
+                return BadRequest("Insufficient funds");
+
+            senderAccount.Stanje -= request.Amount;
+            recipientAccount.Stanje += request.Amount;
+
+            var transaction = new Transakcija
+            {
+                Posiljaoc = senderAccount.Id,
+                Primaoc = recipientAccount.Id,
+                Iznos = request.Amount,
+                SvrhaUplate = request.Purpose ?? "",
+                VrijemeTransakcije = DateTime.UtcNow
+            };
+
+            _context.Transakcija.Add(transaction);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Transaction successful" });
         }
     }
 }

@@ -22,7 +22,7 @@ namespace ETFPay.Controllers
             if (User.Identity.IsAuthenticated)
             {
                 // 2. Ako je Admin, pošalji ga na Admin Dashboard
-                if (User.IsInRole("Administrator"))
+                if (User.IsInRole("Admin"))
                 {
                     return RedirectToAction("AdminIndex", "Home");
                 }
@@ -35,8 +35,7 @@ namespace ETFPay.Controllers
             }
             return View();
         }
-        // Početna za Admina (Pristup dopušten samo Administratorima)
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Roles = "Admin")]
         public IActionResult AdminIndex()
         {
             return View();

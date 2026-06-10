@@ -5,7 +5,7 @@ using ETFPay.Services;
 
 namespace ETFPay.Controllers
 {
-    [Authorize(Roles = "Admin,Uposlenik")]
+    [Authorize(Roles = "Admin,Uposlenik,Client")]
     public class KursController : Controller
     {
         private readonly KursService _kursService;

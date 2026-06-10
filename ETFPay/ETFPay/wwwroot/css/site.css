@@ -96,6 +96,11 @@ body::after {
   font-weight: 600;
 }
 
+.navbar .nav-link-active {
+  color: var(--primary) !important;
+  font-weight: 700;
+}
+
 .navbar-brand .logo, img.logo {
   height: 46px;
   margin-right: 12px;

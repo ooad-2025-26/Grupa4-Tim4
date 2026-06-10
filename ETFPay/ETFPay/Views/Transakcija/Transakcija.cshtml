@@ -50,7 +50,7 @@
         <div class="col-md-8">
             <h2 class="fw-bold text-center mb-4">PAYMENT DETAILS</h2>
 
-            <form asp-action="CreateTransaction" asp-controller="Transakcija" method="post">
+            <form id="paymentForm" asp-action="CreateTransaction" asp-controller="Transakcija" method="post">
 
              
                     <div class="row">
@@ -65,7 +65,8 @@
                            required />
                     </div>
                     <div class="col-md-6 mb-3">
-                        <input name="RecipientAccountNumber"
+                        <input id="accountNumber"
+                               name="RecipientAccountNumber"
                                class="form-control"
                                placeholder="Account Number / IBAN"
                                required
@@ -154,26 +155,27 @@
 
         document.getElementById('newPaymentBtn')
             .addEventListener('click', function () {
-
-                document.querySelector('form').reset();
+                document.getElementById('paymentForm').reset();
             });
+
+        document.getElementById("paymentForm").addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const token = document.querySelector('input[name="__RequestVerificationToken"]');
+            if (token) {
+                formData.append("__RequestVerificationToken", token.value);
+            }
+
+            const response = await fetch("/Transakcija/CreateTransaction", {
+                method: "POST",
+                body: formData
+            });
+
+            const result = await response.json();
+            document.getElementById("result").innerText =
+                response.ok ? result.message : (result.title ?? "Error");
+        });
 
     </script>
 }
-<script>
-    document.getElementById("paymentForm").addEventListener("submit", async function (e) {
-        e.preventDefault();
-
-        const formData = new FormData(this);
-
-        const response = await fetch("/Transakcija/CreateTransaction", {
-            method: "POST",
-            body: formData
-        });
-
-        const result = await response.json();
-
-        document.getElementById("result").innerText =
-            response.ok ? result.message : "Error";
-    });
-</script>

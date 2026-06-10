@@ -6,7 +6,6 @@ using ETFPay.Models;
 
 namespace ETFPay.Controllers
 {
-    [Authorize(Roles = "Admin,Uposlenik")]
     public class PredlozakController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -17,12 +16,14 @@ namespace ETFPay.Controllers
         }
 
         // GET: Predlozak
+        [Authorize(Roles = "Admin,Uposlenik")]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Predlozak.ToListAsync());
         }
 
         // GET: Predlozak/PretplataView
+        [Authorize(Roles = "Client")]
         public async Task<IActionResult> PretplataView(string id)
         {
             var subscriptions = await _context.Predlozak
@@ -47,6 +48,7 @@ namespace ETFPay.Controllers
         }
 
         // GET: Predlozak/DodavanjePretplate
+        [Authorize(Roles = "Client")]
         public IActionResult DodavanjePretplate()
         {
             return View();
@@ -55,6 +57,7 @@ namespace ETFPay.Controllers
         // POST: Predlozak/DodavanjePretplate
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Client")]
         public async Task<IActionResult> DodavanjePretplate([Bind("Naziv,Primaoc,SvrhaUplate,Adresa,Grad,BrojRacuna,Iznos,Period")] Predlozak predlozak)
         {
             ModelState.Remove("Id");
@@ -87,6 +90,7 @@ namespace ETFPay.Controllers
         }
 
         // GET: Predlozak/PredlozakView
+        [Authorize(Roles = "Client")]
         public async Task<IActionResult> PredlozakView(string id)
         {
             var templates = await _context.Predlozak
@@ -111,6 +115,7 @@ namespace ETFPay.Controllers
         }
 
         // GET: Predlozak/DodavanjePredlozaka
+        [Authorize(Roles = "Client")]
         public IActionResult DodavanjePredlozaka()
         {
             return View();
@@ -119,6 +124,7 @@ namespace ETFPay.Controllers
         // POST: Predlozak/DodavanjePredlozaka
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Client")]
         public async Task<IActionResult> DodavanjePredlozaka([Bind("Naziv,Primaoc,SvrhaUplate,Adresa,Grad,BrojRacuna,Iznos")] Predlozak predlozak)
         {
             ModelState.Remove("Id");
@@ -146,6 +152,7 @@ namespace ETFPay.Controllers
         }
 
         // GET: Predlozak/Details/5
+        [Authorize(Roles = "Admin,Uposlenik")]
         public async Task<IActionResult> Details(string id)
         {
             if (id == null)
@@ -164,6 +171,7 @@ namespace ETFPay.Controllers
         }
 
         // GET: Predlozak/Create
+        [Authorize(Roles = "Admin,Uposlenik")]
         public IActionResult Create()
         {
             return View();
@@ -174,6 +182,7 @@ namespace ETFPay.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Uposlenik")]
         public async Task<IActionResult> Create([Bind("Id,Naziv,Primaoc,SvrhaUplate,Adresa,Grad,BrojRacuna,Iznos,Pretplata,Period")] Predlozak predlozak)
         {
             if (ModelState.IsValid)
@@ -186,6 +195,7 @@ namespace ETFPay.Controllers
         }
 
         // GET: Predlozak/Edit/5
+        [Authorize(Roles = "Admin,Uposlenik")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null)
@@ -206,6 +216,7 @@ namespace ETFPay.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Uposlenik")]
         public async Task<IActionResult> Edit(string id, [Bind("Id,Naziv,Primaoc,SvrhaUplate,Adresa,Grad,BrojRacuna,Iznos,Pretplata,Period")] Predlozak predlozak)
         {
             if (id != predlozak.Id)
@@ -237,6 +248,7 @@ namespace ETFPay.Controllers
         }
 
         // GET: Predlozak/Delete/5
+        [Authorize(Roles = "Client")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null)
@@ -257,6 +269,7 @@ namespace ETFPay.Controllers
         // POST: Predlozak/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Client")]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             var predlozak = await _context.Predlozak.FindAsync(id);

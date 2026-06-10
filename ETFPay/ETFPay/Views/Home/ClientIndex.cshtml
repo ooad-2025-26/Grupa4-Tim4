@@ -76,11 +76,46 @@
         font-weight: 600;
     }
 
-            <div class="mb-4">
-                <small class="text-white-50 d-block text-uppercase small" style="font-size: 0.75rem;">Stanje računa</small>
-                <span class="fs-2 fw-bold">
-                    @(Model != null ? Model.Stanje.ToString("N2") : "0,00") KM
-                </span>
+    .transakcija-oblacic .transakcija-datum {
+        color: #5a7a74;
+        font-size: 0.8rem;
+    }
+
+    .transakcija-oblacic .transakcija-iznos {
+        font-weight: 700;
+        font-size: 1.05rem;
+        white-space: nowrap;
+    }
+
+    .transakcija-oblacic .iznos-ulaz {
+        color: #1F6B60;
+    }
+
+    .transakcija-oblacic .iznos-izlaz {
+        color: #c0392b;
+    }
+
+    .transakcije-prazno {
+        background: rgba(31, 107, 96, 0.08);
+        border: 1px dashed rgba(31, 107, 96, 0.25);
+        border-radius: 16px;
+        color: #5a7a74;
+    }
+
+    .client-home {
+        position: relative;
+        z-index: 1;
+        padding-bottom: 50px;
+    }
+</style>
+
+<div class="client-home">
+    @if (!racunAktivan)
+    {
+        <div class="d-flex justify-content-center align-items-center" style="min-height: 50vh;">
+            <div class="alert alert-warning text-center shadow-sm" style="max-width: 500px;">
+                <h5 class="alert-heading mb-3">Račun nije aktiviran</h5>
+                <p class="mb-0">Morate otići u poslovnicu za aktiviranje računa.</p>
             </div>
         </div>
     }
@@ -115,5 +150,36 @@
                 </div>
             </div>
 
-    </div>
-    </div></div>
+            <div class="mt-4" style="max-width: 450px; width: 100%;">
+                <h6 class="transakcije-naslov text-uppercase mb-3" style="font-size: 0.75rem;">
+                    Zadnje transakcije
+                </h6>
+
+                @if (transakcije.Any())
+                {
+                    <div class="transakcije-lista">
+                        @foreach (var t in transakcije)
+                        {
+                            var jeUlazna = t.Primaoc == racun.Id;
+                            <div class="transakcija-oblacic">
+                                <div>
+                                    <div class="transakcija-tip">@(jeUlazna ? "Uplata" : "Isplata")</div>
+                                    <div class="transakcija-datum">@t.VrijemeTransakcije.ToString("dd.MM.yyyy HH:mm")</div>
+                                </div>
+                                <span class="transakcija-iznos @(jeUlazna ? "iznos-ulaz" : "iznos-izlaz")">
+                                    @(jeUlazna ? "+" : "-")@t.Iznos.ToString("N2") KM
+                                </span>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="transakcije-prazno text-center py-3">
+                        Nema transakcija za prikazati.
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
