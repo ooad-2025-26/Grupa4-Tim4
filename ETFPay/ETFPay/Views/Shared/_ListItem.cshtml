@@ -1,0 +1,23 @@
+@model ETFPay.Models.Predlozak
+
+@{
+    var isSelected = (bool)(ViewBag.IsSelected ?? false);
+    var actionName = (string)(ViewBag.ActionName ?? "Details");
+}
+
+<a asp-action="@actionName" asp-route-id="@Model.Id" style="text-decoration: none; display: block; margin-bottom: 15px;">
+    @if (isSelected)
+    {
+        <button type="button" class="btn btn-success btn-lg w-100" style="background-color: #2d8a6f; border: none; padding: 12px; font-weight: 600; font-size: 16px; text-align: left;">
+            @Model.Naziv
+        </button>
+    }
+    else
+    {
+        <div style="padding: 12px; font-size: 16px; color: #333; font-weight: 500; text-align: left; border-radius: 8px; transition: background-color 0.3s ease; cursor: pointer;"
+             onmouseover="this.style.backgroundColor='#f0f0f0';"
+             onmouseout="this.style.backgroundColor='transparent';">
+            @Model.Naziv
+        </div>
+    }
+</a>

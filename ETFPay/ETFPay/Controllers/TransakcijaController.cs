@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using ETFPay.Data;
+using ETFPay.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -9,8 +8,15 @@ using ETFPay.Data;
 using ETFPay.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
+
 namespace ETFPay.Controllers
 {
+    [Authorize(Roles ="Admin,Uposlenik")]
     public class TransakcijaController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -19,7 +25,10 @@ namespace ETFPay.Controllers
         {
             _context = context;
         }
-
+        public IActionResult Transakcija()
+        {
+            return View();
+        }
         // GET: Transakcija
         public async Task<IActionResult> Index()
         {

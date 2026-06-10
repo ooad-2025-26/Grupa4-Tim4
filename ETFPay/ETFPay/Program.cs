@@ -1,5 +1,7 @@
 using ETFPay.Data;
+using ETFPay.Filters;
 using ETFPay.Models;
+using ETFPay.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,8 +19,14 @@ builder.Services.AddDefaultIdentity<Osoba>()
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(options =>
+{
+    options.Filters.Add<ClientAccountViewBagFilter>();
+});
+builder.Services.AddScoped<ClientAccountViewBagFilter>();
 builder.Services.AddRazorPages();
+
+builder.Services.AddHttpClient<KursService>();
 
 var app = builder.Build();
 

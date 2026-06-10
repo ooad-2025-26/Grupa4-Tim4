@@ -1,7 +1,10 @@
-﻿@model ETFPay.Models.Racun // Pretpostavljam da koristiš model Račun za prikaz ovih podataka
+﻿@model ETFPay.Models.Racun
 
 @{
     ViewData["Title"] = "Klijent Panel";
+    var racunAktivan = (bool)(ViewBag.RacunAktivan ?? false);
+    var racun = ViewBag.Racun as ETFPay.Models.Racun;
+    var transakcije = ViewBag.ZadnjeTransakcije as List<ETFPay.Models.Transakcija> ?? new();
 }
 
 <style>
@@ -28,7 +31,7 @@
             }
 
     .card-racun {
-        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        background: linear-gradient(135deg, #1F6B60 0%, #15524A 100%);
         color: white;
         border: none;
         border-radius: 16px;
@@ -44,25 +47,34 @@
         border-radius: 4px;
         opacity: 0.8;
     }
-</style>
 
+    .transakcije-naslov {
+        color: #1F6B60;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+    }
 
-<div class="hero">
-    <div class="container">
-        <div class="d-flex justify-content-center align-items-center" style="min-height: 50vh;">
+    .transakcije-lista {
+        display: flex;
+        flex-direction: column;
+        gap: 0.65rem;
+    }
 
-            <div class="card card-racun p-4">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <span class="fw-bold fs-5 tracking-wide">ETFPAY CARD</span>
-                <div class="chip-ikonica"></div>
-            </div>
+    .transakcija-oblacic {
+        background: linear-gradient(135deg, rgba(31, 107, 96, 0.14) 0%, rgba(21, 82, 74, 0.1) 100%);
+        border: 1px solid rgba(31, 107, 96, 0.22);
+        border-radius: 16px;
+        padding: 0.85rem 1.1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 12px rgba(31, 107, 96, 0.08);
+    }
 
-            <div class="mb-4">
-                <small class="text-white-50 d-block text-uppercase small" style="font-size: 0.75rem;">Broj računa</small>
-                <span class="fs-4 fw-mono" style="letter-spacing: 2px;">
-                    @(Model != null ? Model.brojRacuna : "1234 - 5678 - 9012 - 3456")
-                </span>
-            </div>
+    .transakcija-oblacic .transakcija-tip {
+        color: #1F6B60;
+        font-weight: 600;
+    }
 
             <div class="mb-4">
                 <small class="text-white-50 d-block text-uppercase small" style="font-size: 0.75rem;">Stanje računa</small>
@@ -70,20 +82,38 @@
                     @(Model != null ? Model.Stanje.ToString("N2") : "0,00") KM
                 </span>
             </div>
-
-            <div class="d-flex justify-content-between align-items-end mt-2">
-                <div>
-                    <small class="text-white-50 d-block text-uppercase small" style="font-size: 0.65rem;">Vlasnik računa</small>
-                    <span class="fw-semibold text-uppercase">@User.Identity.Name</span>
+        </div>
+    }
+    else
+    {
+        <div class="d-flex flex-column align-items-center py-4">
+            <div class="card card-racun p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <span class="fw-bold fs-5 tracking-wide">ETFPAY CARD</span>
+                    <div class="chip-ikonica"></div>
                 </div>
-                <div class="text-end">
-                    <small class="text-white-50 d-block text-uppercase small" style="font-size: 0.65rem;">Kreiran (MM/YY)</small>
-                    <span class="fw-semibold">
-                        @(Model != null ? Model.DatumKreiranja.ToString("MM/yy") : DateTime.Now.ToString("MM/yy"))
-                    </span>
+
+                <div class="mb-4">
+                    <small class="text-white-50 d-block text-uppercase small" style="font-size: 0.75rem;">Broj računa</small>
+                    <span class="fs-4 fw-mono" style="letter-spacing: 2px;">@racun!.brojRacuna</span>
+                </div>
+
+                <div class="mb-4">
+                    <small class="text-white-50 d-block text-uppercase small" style="font-size: 0.75rem;">Stanje računa</small>
+                    <span class="fs-2 fw-bold">@racun.Stanje.ToString("N2") KM</span>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-end mt-2">
+                    <div>
+                        <small class="text-white-50 d-block text-uppercase small" style="font-size: 0.65rem;">Vlasnik računa</small>
+                        <span class="fw-semibold text-uppercase">@User.Identity!.Name</span>
+                    </div>
+                    <div class="text-end">
+                        <small class="text-white-50 d-block text-uppercase small" style="font-size: 0.65rem;">Kreiran (MM/YY)</small>
+                        <span class="fw-semibold">@racun.DatumKreiranja.ToString("MM/yy")</span>
+                    </div>
                 </div>
             </div>
-        </div>
 
     </div>
-</div>
+    </div></div>

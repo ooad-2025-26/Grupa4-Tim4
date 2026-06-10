@@ -32,6 +32,13 @@ body {
     position: relative;
     font-family: 'Poppins', "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    position: relative;
+    z-index: 1;
 }
 
 /* detalj na dnu ekrana (onaj zeleni val) */

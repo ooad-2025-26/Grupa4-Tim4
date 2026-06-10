@@ -52,16 +52,16 @@
                     </ul>
 
                     <div class="d-flex align-items-center">
-                        @if (User.Identity.IsAuthenticated && User.IsInRole("Client"))
+                        @if (User.Identity.IsAuthenticated && User.IsInRole("Client") && ViewBag.RacunAktivan as bool? == true)
                         {
                             <ul class="navbar-nav me-3 gap-2">
                                 <li class="nav-item">
-                                    <a class="nav-link @(currentController == "Subscriptions" ? "text-primary fw-bold" : "text-dark")"
-                                       asp-controller="Subscriptions" asp-action="Index">Subscriptions</a>
+                                    <a class="nav-link text-dark"
+                                       asp-controller="Predlozak" asp-action="PretplataView">PRETPLATE</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link @(currentController == "Templates" ? "text-primary fw-bold" : "text-dark")"
-                                       asp-controller="Templates" asp-action="Index">Templates</a>
+                                    <a class="nav-link text-dark"
+                                       asp-controller="Predlozak" asp-action="PredlozakView">PREDLOSCI</a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link text-dark"
@@ -72,8 +72,11 @@
                                        asp-controller="Currencies" asp-action="Index">Currencies</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link @(currentController == "Payment" ? "text-primary fw-bold" : "text-dark")"
-                                       asp-controller="Payment" asp-action="Index">Payment</a>
+                                    <a class="nav-link @(currentController == "Transakcija" ? "text-primary fw-bold" : "text-dark")"
+                                       asp-controller="Transakcija"
+                                       asp-action="Transakcija">
+                                        Payment
+                                    </a>
                                 </li>
                             </ul>
                         }
