@@ -5,14 +5,70 @@
     var i = 0;
 }
 
+<style>
+    .history-rates {
+        max-width: 560px;
+    }
+
+    .history-rates .rate-row {
+        min-height: 3.5rem;
+        grid-template-columns: minmax(10.5rem, 1fr) 9rem;
+        border-radius: 12px;
+    }
+
+    .history-rates .rate-row .code {
+        display: none;
+    }
+
+    .history-rates .rate-row .name {
+        white-space: nowrap;
+        padding-right: 0.75rem;
+    }
+
+    .history-rates .rate-row .value {
+        white-space: nowrap;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .history-rates .iznos-ulaz {
+        color: #1F6B60;
+        font-weight: 700;
+    }
+
+    .history-rates .iznos-izlaz {
+        color: #c0392b;
+        font-weight: 700;
+    }
+
+    .history-rates .rate-row.active .iznos-ulaz {
+        color: #b8f5dc;
+    }
+
+    .history-rates .rate-row.active .iznos-izlaz {
+        color: #ffc9c9;
+    }
+
+    .history-detail .iznos-ulaz {
+        color: #1F6B60;
+    }
+
+    .history-detail .iznos-izlaz {
+        color: #c0392b;
+    }
+
+    .history-layout {
+        gap: 40px;
+    }
+</style>
+
 <div class="hero">
     <div class="container">
         <h1>HISTORIJA TRANSAKCIJA</h1>
         <div class="divider"></div>
 
-        <div class="row g-4 justify-content-center">
+        <div class="row history-layout justify-content-center">
             <div class="col-lg-5">
-                <div class="rates mx-auto">
+                <div class="rates mx-auto history-rates">
                     <div class="rate-row fw-bold" style="pointer-events:none">
                         <span class="code"></span>
                         <span class="name">Transakcije</span>
@@ -32,7 +88,7 @@
                            class="rate-row text-decoration-none @(odabrana?.Id == t.Id ? "active" : "")">
                             <span class="code"></span>
                             <span class="name">Transakcija @i</span>
-                            <span class="value">@(plus ? "+" : "-")@t.Iznos.ToString("N2") KM</span>
+                            <span class="value @(plus ? "iznos-ulaz" : "iznos-izlaz")">@(plus ? "+" : "-")@t.Iznos.ToString("N2") KM</span>
                         </a>
                     }
                 </div>
@@ -43,7 +99,7 @@
                 {
                     var idx = Model.Transakcije.FindIndex(t => t.Id == odabrana.Id) + 1;
                     var plus = odabrana.Primaoc == Model.RacunIdKorisnika;
-                    <div class="conversion mx-auto">
+                    <div class="conversion mx-auto history-detail">
                         <div class="rate-row active mb-3" style="pointer-events:none">
                             <span class="code"></span>
                             <span class="name">TRANSAKCIJA @idx</span>
@@ -55,7 +111,7 @@
                         </div>
                         <div class="d-flex justify-content-between py-2 border-bottom">
                             <span>Iznos</span>
-                            <span class="fw-semibold">@(plus ? "+" : "-")@odabrana.Iznos.ToString("N2") KM</span>
+                            <span class="fw-semibold @(plus ? "iznos-ulaz" : "iznos-izlaz")">@(plus ? "+" : "-")@odabrana.Iznos.ToString("N2") KM</span>
                         </div>
                         <div class="d-flex justify-content-between py-2 border-bottom">
                             <span>Svrha uplate</span>

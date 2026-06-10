@@ -67,7 +67,7 @@
             <div class="mb-4">
                 <small class="text-white-50 d-block text-uppercase small" style="font-size: 0.75rem;">Stanje računa</small>
                 <span class="fs-2 fw-bold">
-                    @(Model != null && !string.IsNullOrEmpty(Model.Stanje) ? decimal.Parse(Model.Stanje).ToString("N2") : "0,00") KM
+                    @(Model != null ? Model.Stanje.ToString("N2") : "0,00") KM
                 </span>
             </div>
 

@@ -196,9 +196,8 @@ namespace ETFPay.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Stanje")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<double>("Stanje")
+                        .HasColumnType("float");
 
                     b.Property<string>("brojRacuna")
                         .IsRequired()

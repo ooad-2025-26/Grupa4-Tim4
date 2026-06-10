@@ -161,15 +161,21 @@ namespace ETFPay.Controllers
 
             var user = await userManager.GetUserAsync(User);
             if (user == null || string.IsNullOrEmpty(user.Racun)) return RedirectToAction("ClientIndex", "Home");
-            var racun = await _context.Racun.FindAsync(user.Racun);
-            if (racun == null) return RedirectToAction("ClientIndex", "Home");
-            var transakcije = await _context.Transakcija.Where(t => t.Primaoc == user.Racun || t.Posiljaoc == user.Racun).
-                OrderByDescending(t => t.VrijemeTransakcije).ToListAsync();
+            var brojRacuna = await _context.Racun
+                .Where(r => r.Id == user.Racun)
+                .Select(r => r.brojRacuna)
+                .FirstOrDefaultAsync();
+            if (string.IsNullOrEmpty(brojRacuna)) return RedirectToAction("ClientIndex", "Home");
+
+            var transakcije = await _context.Transakcija
+                .Where(t => t.Primaoc == user.Racun || t.Posiljaoc == user.Racun)
+                .OrderByDescending(t => t.VrijemeTransakcije)
+                .ToListAsync();
             return View(new TransakcijeViewModel
             {
                 Transakcije = transakcije,
                 Odabrana = !string.IsNullOrEmpty(id) ? transakcije.FirstOrDefault(t => t.Id == id) : transakcije.FirstOrDefault(),
-                BrojRacunaKorisnika = racun.brojRacuna,
+                BrojRacunaKorisnika = brojRacuna,
                 RacunIdKorisnika = user.Racun
             });
 
