@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ETFPay.Data;
 using ETFPay.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ETFPay.Controllers
 {
+    [Authorize(Roles ="Admin,Uposlenik")]
     public class TransakcijaController : Controller
     {
         private readonly ApplicationDbContext _context;

@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ETFPay.Data;
 using ETFPay.Models;
 
 namespace ETFPay.Controllers
 {
+    [Authorize(Roles = "Admin,Uposlenik")]
     public class PredlozakController : Controller
     {
         private readonly ApplicationDbContext _context;

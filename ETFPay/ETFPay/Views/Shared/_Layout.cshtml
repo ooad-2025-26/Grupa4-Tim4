@@ -52,7 +52,7 @@
                     </ul>
 
                     <div class="d-flex align-items-center">
-                        @if (User.Identity.IsAuthenticated && User.IsInRole("Client"))
+                        @if (User.Identity.IsAuthenticated && User.IsInRole("Client") && ViewBag.RacunAktivan as bool? == true)
                         {
                             <ul class="navbar-nav me-3 gap-2">
                                 <li class="nav-item">

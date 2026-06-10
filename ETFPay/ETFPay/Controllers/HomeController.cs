@@ -2,11 +2,21 @@ using ETFPay.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-
+using ETFPay.Data;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 namespace ETFPay.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly UserManager<Osoba> _userManager;
+        private readonly ApplicationDbContext _context;
+
+        public HomeController(UserManager<Osoba> userManager, ApplicationDbContext context)
+        {
+            _userManager = userManager;
+            _context = context;
+        }
         public IActionResult Index()
         {
             if (User.Identity.IsAuthenticated)
@@ -33,8 +43,22 @@ namespace ETFPay.Controllers
         }
 
         [Authorize(Roles = "Client")]
-        public IActionResult ClientIndex()
-        {
+        public async Task<IActionResult> ClientIndex() {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Challenge();
+            var racun = await _context.Racun.FirstOrDefaultAsync(r => r.Id == user.Racun);
+            ViewBag.RacunAktivan = racun?.Aktivan == true;
+            ViewBag.Racun = racun;
+
+            if (racun?.Aktivan == true)
+            {
+                ViewBag.ZadnjeTransakcije = await _context.Transakcija
+                    .Where(t => t.Posiljaoc == racun.Id || t.Primaoc == racun.Id)
+                    .OrderByDescending(t => t.VrijemeTransakcije)
+                    .Take(3)
+                    .ToListAsync();
+            }
+
             return View();
         }
 

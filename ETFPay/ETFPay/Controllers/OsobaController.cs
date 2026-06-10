@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ETFPay.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Uposlenik")]
     public class OsobaController : Controller
     {
         private readonly ApplicationDbContext _context;
