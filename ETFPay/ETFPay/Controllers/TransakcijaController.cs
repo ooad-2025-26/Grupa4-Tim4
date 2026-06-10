@@ -4,6 +4,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using ETFPay.Data;
+using ETFPay.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -60,7 +64,7 @@ namespace ETFPay.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Primaoc,Posiljaoc,Iznos,VrijemeTransakcije")] Transakcija transakcija)
+        public async Task<IActionResult> Create([Bind("Id,Primaoc,Posiljaoc,Iznos,VrijemeTransakcije,SvrhaUplate")] Transakcija transakcija)
         {
             if (ModelState.IsValid)
             {
@@ -92,7 +96,7 @@ namespace ETFPay.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("Id,Primaoc,Posiljaoc,Iznos,VrijemeTransakcije")] Transakcija transakcija)
+        public async Task<IActionResult> Edit(string id, [Bind("Id,Primaoc,Posiljaoc,Iznos,VrijemeTransakcije,SvrhaUplate")] Transakcija transakcija)
         {
             if (id != transakcija.Id)
             {
@@ -159,75 +163,32 @@ namespace ETFPay.Controllers
         {
             return _context.Transakcija.Any(e => e.Id == id);
         }
-        public class CreateTransactionRequest
+
+        [Authorize(Roles = "Client")]
+        public async Task<IActionResult> MojeTransakcije(string? id, [FromServices] UserManager<Osoba> userManager)
         {
-            public string RecipientAccountNumber { get; set; }
-            public Double Amount { get; set; }
-            public string? Purpose { get; set; }
-        }
 
-        [HttpPost]
-        [Authorize]
-        public async Task<IActionResult> CreateTransaction(CreateTransactionRequest request)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            var user = await userManager.GetUserAsync(User);
+            if (user == null || string.IsNullOrEmpty(user.Racun)) return RedirectToAction("ClientIndex", "Home");
+            var brojRacuna = await _context.Racun
+                .Where(r => r.Id == user.Racun)
+                .Select(r => r.brojRacuna)
+                .FirstOrDefaultAsync();
+            if (string.IsNullOrEmpty(brojRacuna)) return RedirectToAction("ClientIndex", "Home");
 
-            // 1. uzmi user ID iz sesije (JWT/cookie identity)
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if (string.IsNullOrEmpty(userId))
-                return Unauthorized();
-
-            // 2. nađi usera u bazi
-            var sender = await _context.Users
-                .FirstOrDefaultAsync(x => x.Id == userId);
-
-            if (sender == null)
-                return Unauthorized();
-
-            // 3. validacija iznosa
-            if (request.Amount <= 0)
-                return BadRequest("Amount must be greater than 0");
-
-            // 4. nađi sender account (ako imaš relaciju)
-            var senderAccount = await _context.Racun
-     .FirstOrDefaultAsync(r => r.Osoba.Id == userId);
-
-            if (senderAccount == null)
-                return BadRequest("Sender account not found");
-
-            // 5. nađi recipient account
-            var recipientAccount = await _context.Racun
-                .FirstOrDefaultAsync(a => a.brojRacuna == request.RecipientAccountNumber);
-
-            if (recipientAccount == null)
-                return BadRequest("Recipient account not found");
-
-            // 6. provjera balance-a
-            if (senderAccount.Stanje < request.Amount)
-                return BadRequest("Insufficient funds");
-
-            // 7. izvrši transakciju
-            senderAccount.Stanje -= request.Amount;
-            recipientAccount.Stanje += request.Amount;
-
-            var transaction = new Transakcija
+            var transakcije = await _context.Transakcija
+                .Where(t => t.Primaoc == user.Racun || t.Posiljaoc == user.Racun)
+                .OrderByDescending(t => t.VrijemeTransakcije)
+                .ToListAsync();
+            return View(new TransakcijeViewModel
             {
+                Transakcije = transakcije,
+                Odabrana = !string.IsNullOrEmpty(id) ? transakcije.FirstOrDefault(t => t.Id == id) : transakcije.FirstOrDefault(),
+                BrojRacunaKorisnika = brojRacuna,
+                RacunIdKorisnika = user.Racun
+            });
 
-                Posiljaoc = senderAccount.Id,
-                Primaoc = recipientAccount.Id,
-                Iznos = request.Amount,
-                SvrhaUplate=request.Purpose,
-                VrijemeTransakcije = DateTime.UtcNow
-            };
 
-            _context.Transakcija.Add(transaction);
-
-            await _context.SaveChangesAsync();
-
-            return Ok(new { message = "Transaction successful" });
         }
-
     }
 }
