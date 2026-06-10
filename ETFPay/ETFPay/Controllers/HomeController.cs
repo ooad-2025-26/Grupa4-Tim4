@@ -49,12 +49,17 @@ namespace ETFPay.Controllers
             var racun = await _context.Racun.FirstOrDefaultAsync(r => r.Id == user.Racun);
             ViewBag.RacunAktivan = racun?.Aktivan == true;
             ViewBag.Racun = racun;
-            if (racun?.Aktivan == true) {
-                ViewBag.ZadnjeTransakcije = await _context.Transakcija.Where(t => t.Posiljaoc == racun.Id || t.Primaoc == racun.Id).OrderByDescending(t =>
-                t.VrijemeTransakcije).Take(3).ToListAsync();
+
+            if (racun?.Aktivan == true)
+            {
+                ViewBag.ZadnjeTransakcije = await _context.Transakcija
+                    .Where(t => t.Posiljaoc == racun.Id || t.Primaoc == racun.Id)
+                    .OrderByDescending(t => t.VrijemeTransakcije)
+                    .Take(3)
+                    .ToListAsync();
             }
 
-                return View();
+            return View();
         }
 
         public IActionResult Privacy()
