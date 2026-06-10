@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 
 namespace ETFPay.Controllers
 {
+    [Authorize(Roles ="Admin,Uposlenik")]
     public class TransakcijaController : Controller
     {
         private readonly ApplicationDbContext _context;

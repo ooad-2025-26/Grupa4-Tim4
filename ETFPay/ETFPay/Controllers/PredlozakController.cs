@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ETFPay.Data;
 using ETFPay.Models;
 
 namespace ETFPay.Controllers
 {
+    [Authorize(Roles = "Admin,Uposlenik")]
     public class PredlozakController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -23,6 +20,129 @@ namespace ETFPay.Controllers
         public async Task<IActionResult> Index()
         {
             return View(await _context.Predlozak.ToListAsync());
+        }
+
+        // GET: Predlozak/PretplataView
+        public async Task<IActionResult> PretplataView(string id)
+        {
+            var subscriptions = await _context.Predlozak
+                .Where(p => p.Pretplata == true)
+                .ToListAsync();
+
+            if (!subscriptions.Any())
+            {
+                return View(new List<Predlozak>());
+            }
+
+            var selectedSubscription = id != null 
+                ? subscriptions.FirstOrDefault(s => s.Id == id)
+                : subscriptions.FirstOrDefault();
+
+            if (selectedSubscription != null)
+            {
+                ViewBag.SelectedSubscription = selectedSubscription;
+            }
+
+            return View(subscriptions);
+        }
+
+        // GET: Predlozak/DodavanjePretplate
+        public IActionResult DodavanjePretplate()
+        {
+            return View();
+        }
+
+        // POST: Predlozak/DodavanjePretplate
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DodavanjePretplate([Bind("Naziv,Primaoc,SvrhaUplate,Adresa,Grad,BrojRacuna,Iznos,Period")] Predlozak predlozak)
+        {
+            ModelState.Remove("Id");
+            ModelState.Remove("Pretplata");
+
+            if (string.IsNullOrEmpty(Request.Form["Period"]))
+            {
+                ModelState.Remove("Period");
+                predlozak.Period = Period.Mjesecno;
+            }
+
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    predlozak.Id = Guid.NewGuid().ToString();
+                    predlozak.Pretplata = true;
+
+                    _context.Add(predlozak);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(PretplataView));
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "An error occurred while saving: " + ex.Message);
+            }
+
+            return View(predlozak);
+        }
+
+        // GET: Predlozak/PredlozakView
+        public async Task<IActionResult> PredlozakView(string id)
+        {
+            var templates = await _context.Predlozak
+                .Where(p => p.Pretplata == false)
+                .ToListAsync();
+
+            if (!templates.Any())
+            {
+                return View(new List<Predlozak>());
+            }
+
+            var selectedTemplate = id != null 
+                ? templates.FirstOrDefault(t => t.Id == id)
+                : templates.FirstOrDefault();
+
+            if (selectedTemplate != null)
+            {
+                ViewBag.SelectedTemplate = selectedTemplate;
+            }
+
+            return View(templates);
+        }
+
+        // GET: Predlozak/DodavanjePredlozaka
+        public IActionResult DodavanjePredlozaka()
+        {
+            return View();
+        }
+
+        // POST: Predlozak/DodavanjePredlozaka
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DodavanjePredlozaka([Bind("Naziv,Primaoc,SvrhaUplate,Adresa,Grad,BrojRacuna,Iznos")] Predlozak predlozak)
+        {
+            ModelState.Remove("Id");
+            ModelState.Remove("Pretplata");
+            ModelState.Remove("Period");
+
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    predlozak.Id = Guid.NewGuid().ToString();
+                    predlozak.Pretplata = false;
+
+                    _context.Add(predlozak);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(PredlozakView));
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "An error occurred while saving: " + ex.Message);
+            }
+
+            return View(predlozak);
         }
 
         // GET: Predlozak/Details/5
@@ -143,9 +263,18 @@ namespace ETFPay.Controllers
             if (predlozak != null)
             {
                 _context.Predlozak.Remove(predlozak);
+                await _context.SaveChangesAsync();
+
+                if (predlozak.Pretplata)
+                {
+                    return RedirectToAction(nameof(PretplataView));
+                }
+                else
+                {
+                    return RedirectToAction(nameof(PredlozakView));
+                }
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
