@@ -6,6 +6,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using System;
 
 namespace ETFPay.Controllers
 {
@@ -17,11 +21,18 @@ namespace ETFPay.Controllers
         {
             _context = context;
         }
+
+        // PRILAGOĐENO: Učitava tvoju stranicu i prosljeđuje predloške iz baze u View
         [Authorize(Roles = "Client")]
-        public IActionResult Transakcija()
+        public async Task<IActionResult> Transakcija()
         {
-            return View();
+            var predlosciIzBaze = await _context.Predlozak
+                .Where(p => p.Pretplata == false)
+                .ToListAsync();
+
+            return View(predlosciIzBaze);
         }
+
         // GET: Transakcija
         [Authorize(Roles = "Admin,Uposlenik")]
         public async Task<IActionResult> Index()
