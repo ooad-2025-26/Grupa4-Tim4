@@ -12,7 +12,7 @@ namespace ETFPay.Models
         [Key]
         public String Id { get; set; }
         public String brojRacuna { get; set; }
-        public String Stanje { get; set; }
+        public double Stanje { get; set; }
         public DateOnly DatumKreiranja { get; set; }
         public String IBAN { get; set; }
         public Boolean Aktivan { get; set; }

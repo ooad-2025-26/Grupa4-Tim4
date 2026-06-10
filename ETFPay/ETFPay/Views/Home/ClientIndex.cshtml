@@ -1,80 +1,185 @@
 ﻿@model ETFPay.Models.Racun
+
 @{
     ViewData["Title"] = "Klijent Panel";
-    var racunAktivan = ViewBag.RacunAktivan as bool? == true;
+    var racunAktivan = (bool)(ViewBag.RacunAktivan ?? false);
     var racun = ViewBag.Racun as ETFPay.Models.Racun;
     var transakcije = ViewBag.ZadnjeTransakcije as List<ETFPay.Models.Transakcija> ?? new();
 }
 
-<div class="hero">
-    <div class="container">
-        @if (!racunAktivan)
-        {
-            <div class="conversion mx-auto text-center">
-                <h1>Račun nije aktiviran</h1>
-                <div class="divider"></div>
-                <p class="mb-0">Morate otići u poslovnicu radi aktivacije računa.</p>
-            </div>
+<style>
+    body {
+        background-color: #f4f7f6;
+    }
+
+    .nav-top {
+        background-color: #ffffff;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+    }
+
+        .nav-top .nav-link {
+            color: #495057;
+            font-weight: 500;
+            padding: 10px 15px;
+            transition: all 0.3s ease;
         }
-        else if (racun != null)
-        {
-            <div class="d-flex flex-column align-items-center">
-                <div class="conversion mx-auto p-4" style="max-width: 450px; background: linear-gradient(135deg, #1F6B60 0%, #15524A 100%); color: #fff;">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <span class="fw-bold fs-5">ETFPAY CARD</span>
-                        <div style="width:40px;height:30px;background:#ffc107;border-radius:4px;opacity:0.8;"></div>
-                    </div>
 
-                    <div class="mb-4">
-                        <small class="d-block text-uppercase opacity-75" style="font-size:0.75rem;">Broj računa</small>
-                        <span class="fs-4 fw-semibold" style="letter-spacing:2px;">@racun.brojRacuna</span>
-                    </div>
+            .nav-top .nav-link:hover {
+                color: #0d6efd;
+                background-color: #f8f9fa;
+                border-radius: 5px;
+            }
 
-                    <div class="mb-4">
-                        <small class="d-block text-uppercase opacity-75" style="font-size:0.75rem;">Stanje računa</small>
-                        <span class="fs-2 fw-bold">@(decimal.Parse(racun.Stanje).ToString("N2")) KM</span>
-                    </div>
+    .card-racun {
+        background: linear-gradient(135deg, #1F6B60 0%, #15524A 100%);
+        color: white;
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 10px 20px rgba(42, 82, 152, 0.25);
+        max-width: 450px;
+        width: 100%;
+    }
 
-                    <div class="d-flex justify-content-between align-items-end">
-                        <div>
-                            <small class="d-block text-uppercase opacity-75" style="font-size:0.65rem;">Vlasnik računa</small>
-                            <span class="fw-semibold text-uppercase">@User.Identity!.Name</span>
-                        </div>
-                        <div class="text-end">
-                            <small class="d-block text-uppercase opacity-75" style="font-size:0.65rem;">Kreiran (MM/YY)</small>
-                            <span class="fw-semibold">@racun.DatumKreiranja.ToString("MM/yy")</span>
-                        </div>
-                    </div>
+    .chip-ikonica {
+        width: 40px;
+        height: 30px;
+        background-color: #ffc107;
+        border-radius: 4px;
+        opacity: 0.8;
+    }
+
+    .transakcije-naslov {
+        color: #1F6B60;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+    }
+
+    .transakcije-lista {
+        display: flex;
+        flex-direction: column;
+        gap: 0.65rem;
+    }
+
+    .transakcija-oblacic {
+        background: linear-gradient(135deg, rgba(31, 107, 96, 0.14) 0%, rgba(21, 82, 74, 0.1) 100%);
+        border: 1px solid rgba(31, 107, 96, 0.22);
+        border-radius: 16px;
+        padding: 0.85rem 1.1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 12px rgba(31, 107, 96, 0.08);
+    }
+
+    .transakcija-oblacic .transakcija-tip {
+        color: #1F6B60;
+        font-weight: 600;
+    }
+
+    .transakcija-oblacic .transakcija-datum {
+        color: #5a7a74;
+        font-size: 0.8rem;
+    }
+
+    .transakcija-oblacic .transakcija-iznos {
+        font-weight: 700;
+        font-size: 1.05rem;
+        white-space: nowrap;
+    }
+
+    .transakcija-oblacic .iznos-ulaz {
+        color: #1F6B60;
+    }
+
+    .transakcija-oblacic .iznos-izlaz {
+        color: #c0392b;
+    }
+
+    .transakcije-prazno {
+        background: rgba(31, 107, 96, 0.08);
+        border: 1px dashed rgba(31, 107, 96, 0.25);
+        border-radius: 16px;
+        color: #5a7a74;
+    }
+
+    .client-home {
+        position: relative;
+        z-index: 1;
+        padding-bottom: 50px;
+    }
+</style>
+
+<div class="client-home">
+    @if (!racunAktivan)
+    {
+        <div class="d-flex justify-content-center align-items-center" style="min-height: 50vh;">
+            <div class="alert alert-warning text-center shadow-sm" style="max-width: 500px;">
+                <h5 class="alert-heading mb-3">Račun nije aktiviran</h5>
+                <p class="mb-0">Morate otići u poslovnicu za aktiviranje računa.</p>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="d-flex flex-column align-items-center py-4">
+            <div class="card card-racun p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <span class="fw-bold fs-5 tracking-wide">ETFPAY CARD</span>
+                    <div class="chip-ikonica"></div>
                 </div>
 
-                <div class="rates mx-auto mt-4" style="max-width:450px;">
-                    <div class="rate-row fw-bold" style="pointer-events:none;">
-                        <span class="code"></span>
-                        <span class="name">Zadnje transakcije</span>
-                        <span class="value"></span>
-                    </div>
+                <div class="mb-4">
+                    <small class="text-white-50 d-block text-uppercase small" style="font-size: 0.75rem;">Broj računa</small>
+                    <span class="fs-4 fw-mono" style="letter-spacing: 2px;">@racun!.brojRacuna</span>
+                </div>
 
-                    @if (transakcije.Any())
-                    {
+                <div class="mb-4">
+                    <small class="text-white-50 d-block text-uppercase small" style="font-size: 0.75rem;">Stanje računa</small>
+                    <span class="fs-2 fw-bold">@racun.Stanje.ToString("N2") KM</span>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-end mt-2">
+                    <div>
+                        <small class="text-white-50 d-block text-uppercase small" style="font-size: 0.65rem;">Vlasnik računa</small>
+                        <span class="fw-semibold text-uppercase">@User.Identity!.Name</span>
+                    </div>
+                    <div class="text-end">
+                        <small class="text-white-50 d-block text-uppercase small" style="font-size: 0.65rem;">Kreiran (MM/YY)</small>
+                        <span class="fw-semibold">@racun.DatumKreiranja.ToString("MM/yy")</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4" style="max-width: 450px; width: 100%;">
+                <h6 class="transakcije-naslov text-uppercase mb-3" style="font-size: 0.75rem;">
+                    Zadnje transakcije
+                </h6>
+
+                @if (transakcije.Any())
+                {
+                    <div class="transakcije-lista">
                         @foreach (var t in transakcije)
                         {
                             var jeUlazna = t.Primaoc == racun.Id;
-                            <div class="rate-row" style="pointer-events:none;">
-                                <span class="code"></span>
-                                <span class="name">@(jeUlazna ? "Uplata" : "Isplata")</span>
-                                <span class="value @(jeUlazna ? "text-success" : "text-danger")">
+                            <div class="transakcija-oblacic">
+                                <div>
+                                    <div class="transakcija-tip">@(jeUlazna ? "Uplata" : "Isplata")</div>
+                                    <div class="transakcija-datum">@t.VrijemeTransakcije.ToString("dd.MM.yyyy HH:mm")</div>
+                                </div>
+                                <span class="transakcija-iznos @(jeUlazna ? "iznos-ulaz" : "iznos-izlaz")">
                                     @(jeUlazna ? "+" : "-")@t.Iznos.ToString("N2") KM
                                 </span>
                             </div>
-                            <small class="text-muted d-block ps-2 pb-2">@t.VrijemeTransakcije.ToString("dd.MM.yyyy HH:mm")</small>
                         }
-                    }
-                    else
-                    {
-                        <p class="text-muted mt-3 mb-0">Nema transakcija za prikazati.</p>
-                    }
-                </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="transakcije-prazno text-center py-3">
+                        Nema transakcija za prikazati.
+                    </div>
+                }
             </div>
-        }
-    </div>
+        </div>
+    }
 </div>
