@@ -4,8 +4,8 @@
     var currentAction = ViewContext.RouteData.Values["Action"]?.ToString();
     var isHome = string.IsNullOrEmpty(currentArea) && currentController == "Home" && currentAction == "Index";
     var isZahtjevi = currentController == "Osoba" && currentAction == "ZahtjeviZaRacun";
-    var isAdministration = currentArea == "Admin" && currentController == "Dashboard" && currentAction == "Index";
-    var isUserSearch = currentArea == "Admin" && currentController == "Dashboard" && currentAction == "UserSearch";
+    var isAdministration = currentController == "Osoba" && currentAction == "Index";
+    var isUserSearch = currentController == "Osoba" && currentAction == "UserSearch";
     var isPretplate = currentController == "Predlozak" && (currentAction == "PretplataView" || currentAction == "DodavanjePretplate");
     var isPredlosci = currentController == "Predlozak" && (currentAction == "PredlozakView" || currentAction == "DodavanjePredlozaka");
     var isHistory = currentController == "Transakcija" && currentAction == "MojeTransakcije";
@@ -57,11 +57,11 @@
                                 @if (User.IsInRole("Admin"))
                                 {
                                     <li class="nav-item">
-                                        <a class="nav-link @(isAdministration ? "nav-link-active" : "text-dark")" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Administration</a>
+                                        <a class="nav-link @(isAdministration ? "nav-link-active" : "text-dark")" asp-controller="Osoba" asp-action="Index">Administration</a>
                                     </li>
                                 }
                                 <li class="nav-item">
-                                    <a class="nav-link @(isUserSearch ? "nav-link-active" : "text-dark")" asp-area="Admin" asp-controller="Dashboard" asp-action="UserSearch">User Search</a>
+                                    <a class="nav-link @(isUserSearch ? "nav-link-active" : "text-dark")" asp-controller="Osoba" asp-action="UserSearch">User Search</a>
                                 </li>
                             </ul>
                         }

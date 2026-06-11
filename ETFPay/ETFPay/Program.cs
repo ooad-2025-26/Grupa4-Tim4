@@ -16,7 +16,11 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<Osoba>()
+builder.Services.AddDefaultIdentity<Osoba>(options =>
+    {
+        options.SignIn.RequireConfirmedAccount = false;
+        options.SignIn.RequireConfirmedEmail = false;
+    })
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
@@ -121,12 +125,28 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+var blockedEmailConfirmationPaths = new[]
+{
+    "/identity/account/confirmemail",
+    "/identity/account/confirmemailchange",
+    "/identity/account/resendemailconfirmation",
+    "/identity/account/registerconfirmation"
+};
+
+app.Use(async (context, next) =>
+{
+    var path = context.Request.Path.Value?.ToLowerInvariant() ?? "";
+    if (blockedEmailConfirmationPaths.Any(p => path.StartsWith(p, StringComparison.Ordinal)))
+    {
+        context.Response.StatusCode = StatusCodes.Status404NotFound;
+        return;
+    }
+
+    await next();
+});
+
 app.UseAuthentication();
 app.UseAuthorization();
-
-app.MapControllerRoute(
-    name: "areas",
-    pattern: "{area:exists}/{controller=Dashboard}/{action=Index}");
 
 app.MapControllerRoute(
     name: "default",

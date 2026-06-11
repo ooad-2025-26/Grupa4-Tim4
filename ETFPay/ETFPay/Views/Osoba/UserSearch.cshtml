@@ -1,4 +1,4 @@
-@model ETFPay.Areas.Admin.Controllers.DashboardController.UserSearchViewModel
+@model ETFPay.Controllers.OsobaController.UserSearchViewModel
 @{
     ViewData["Title"] = "User Search";
 }
@@ -196,7 +196,7 @@
     <div class="search-toolbar">
         <div class="search-toolbar-section">
             <h3 class="search-section-title">Search</h3>
-            <form class="admin-form" method="get" asp-area="Admin" asp-controller="Dashboard" asp-action="UserSearch">
+            <form class="admin-form" method="get" asp-controller="Osoba" asp-action="UserSearch">
                 <input type="hidden" name="filter" value="@Model.Filter" />
                 <input type="hidden" name="sort" value="@Model.Sort" />
                 <input type="hidden" name="sortDir" value="@Model.SortDirection" />
@@ -208,7 +208,7 @@
 
         <div class="search-toolbar-section">
             <h3 class="search-section-title">Filter</h3>
-            <form class="admin-form" method="get" asp-area="Admin" asp-controller="Dashboard" asp-action="UserSearch">
+            <form class="admin-form" method="get" asp-controller="Osoba" asp-action="UserSearch">
                 <input type="hidden" name="q" value="@Model.Pretraga" />
                 <input type="hidden" name="sort" value="@Model.Sort" />
                 <input type="hidden" name="sortDir" value="@Model.SortDirection" />
@@ -226,7 +226,7 @@
 
         <div class="search-toolbar-section">
             <h3 class="search-section-title">Sort</h3>
-            <form class="admin-form" method="get" asp-area="Admin" asp-controller="Dashboard" asp-action="UserSearch">
+            <form class="admin-form" method="get" asp-controller="Osoba" asp-action="UserSearch">
                 <input type="hidden" name="q" value="@Model.Pretraga" />
                 <input type="hidden" name="filter" value="@Model.Filter" />
                 <input type="hidden" name="id" value="@Model.OdabraniId" />
@@ -259,8 +259,7 @@
                     @foreach (var k in Model.Klijenti)
                     {
                         <a class="admin-list-item @(k.Id == Model.OdabraniId ? "active" : "")"
-                           asp-area="Admin"
-                           asp-controller="Dashboard"
+                           asp-controller="Osoba"
                            asp-action="UserSearch"
                            asp-route-q="@Model.Pretraga"
                            asp-route-filter="@Model.Filter"
@@ -281,7 +280,7 @@
             @if (Model.Odabrani != null)
             {
                 <div class="left-actions">
-                    <form asp-area="Admin" asp-controller="Dashboard" asp-action="ObrisiKlijenta" method="post"
+                    <form asp-controller="Osoba" asp-action="ObrisiKlijenta" method="post"
                           onsubmit="return confirm('Are you sure you want to delete this client?');">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="id" value="@Model.Odabrani.Id" />
