@@ -17,5 +17,7 @@ namespace ETFPay.Models
         public Double Iznos { get; set; }
         public Boolean Pretplata { get; set; }
         public Period Period { get; set; }
+
+        public DateOnly PosljednjePlacanje { get; set; }
     }
 }
