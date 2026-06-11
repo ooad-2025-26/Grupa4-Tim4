@@ -132,7 +132,6 @@
 
 @section Scripts {
     <script>
-        // 1. Klik na šablon puni desnu stranu podacima
         const templateButtons = document.querySelectorAll('.template-item');
 
         templateButtons.forEach(btn => {
@@ -149,47 +148,39 @@
             });
         });
 
-        // 2. Klik na NEW PAYMENT čisti formu
         document.getElementById('newPaymentBtn').addEventListener('click', function () {
             document.getElementById('paymentForm').reset();
             document.getElementById('result').innerText = "";
             document.getElementById('recipientName').focus();
         });
 
-       
-        // NOVO: LOGIKA ZA SPASAVANJE PREDLOŠKA (SAVE TEMPLATE)
-   
         document.getElementById('saveTemplateBtn').addEventListener('click', async function () {
             const resultDiv = document.getElementById("result");
 
-            // Pokupimo podatke iz input polja
             const primaoc = document.getElementById('recipientName').value.trim();
             const brojRacuna = document.getElementById('accountNumber').value.trim();
             const svrha = document.getElementById('purpose').value.trim();
             const grad = document.getElementById('city').value.trim();
             const adresa = document.getElementById('address').value.trim();
 
-            // Osnovna validacija: Ne dozvoljavamo spasavanje ako su glavna polja prazna
             if (!primaoc || !brojRacuna || !svrha) {
-                resultDiv.innerText = "Molimo popunite Ime, Račun i Svrhu prije spasavanja predloška!";
+                resultDiv.innerText = "Please fill in Name, Account Number and Purpose before saving the template!";
                 resultDiv.style.color = "red";
                 return;
             }
 
-            // Kreiramo objekat koji šaljemo na backend (nazivi moraju odgovarati C# akciji)
             const templateData = {
                 Primaoc: primaoc,
                 BrojRacuna: brojRacuna,
                 SvrhaUplate: svrha,
                 Grad: grad,
                 Adresa: adresa,
-                Naziv: "Predložak: " + primaoc // Automatski generišemo naziv predloška
+                Naziv: "Template: " + primaoc
             };
 
-            resultDiv.innerText = "Spasavam predložak...";
+            resultDiv.innerText = "Saving template...";
             resultDiv.style.color = "orange";
 
-             
             const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
             const headers = {
                 'Content-Type': 'application/json'
@@ -199,7 +190,6 @@
             }
 
             try {
-                // Šaljemo podatke na kontroler 'Predlozak' i akciju 'SaveTemplate'
                 const response = await fetch("/Predlozak/SaveTemplate", {
                     method: "POST",
                     headers: headers,
@@ -207,20 +197,19 @@
                 });
 
                 if (response.ok) {
-                    resultDiv.innerText = "Predložak uspješno spasen u bazu! Osvježite stranicu da se pojavi u listi.";
+                    resultDiv.innerText = "Template successfully saved! Refresh the page to see it in the list.";
                     resultDiv.style.color = "green";
                 } else {
                     const errorText = await response.text();
-                    resultDiv.innerText = "Greška pri spasavanju: " + errorText;
+                    resultDiv.innerText = "Error saving template: " + errorText;
                     resultDiv.style.color = "red";
                 }
             } catch (error) {
-                resultDiv.innerText = "Greška u komunikaciji sa serverom.";
+                resultDiv.innerText = "Communication error with the server.";
                 resultDiv.style.color = "red";
             }
         });
 
-        // 4. AJAX slanje uplate (PAY dugme)
         document.getElementById("paymentForm").addEventListener("submit", async function (e) {
             e.preventDefault();
 
@@ -247,11 +236,11 @@
                     resultDiv.style.color = "green";
                     this.reset();
                 } else {
-                    resultDiv.innerText = result.title ?? "Error occurred.";
+                    resultDiv.innerText = result.message || "An error occurred during transaction.";
                     resultDiv.style.color = "red";
                 }
             } catch (error) {
-                resultDiv.innerText = "Connection error.";
+                resultDiv.innerText = "Failed to process transaction. Server connection error.";
                 resultDiv.style.color = "red";
             }
         });
