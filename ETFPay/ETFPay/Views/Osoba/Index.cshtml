@@ -1,4 +1,4 @@
-@model ETFPay.Areas.Admin.Controllers.DashboardController.AdminDashboardViewModel
+@model ETFPay.Controllers.OsobaController.AdminDashboardViewModel
 @{
     ViewData["Title"] = "Administration";
 }
@@ -208,7 +208,7 @@
                 @foreach (var u in Model.Uposlenici)
                 {
                     <a class="admin-list-item @(u.Id == Model.OdabraniId ? "active" : "")"
-                       href="@Url.Action("Index", "Dashboard", new { area = "Admin", id = u.Id })">
+                       href="@Url.Action("Index", "Osoba", new { id = u.Id })">
                         <span>@u.PunoIme</span>
                         <span>@u.Uloga</span>
                     </a>
@@ -223,7 +223,7 @@
         @if (Model.Odabrani != null && !Model.PrikaziNoviForm)
         {
             <div class="left-actions">
-                <form asp-area="Admin" asp-controller="Dashboard" asp-action="ObrisiUposlenika" method="post"
+                <form asp-controller="Osoba" asp-action="ObrisiUposlenika" method="post"
                       onsubmit="return confirm('Are you sure you want to delete this employee?');">
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="id" value="@Model.Odabrani.Id" />
@@ -250,10 +250,10 @@
             @if (Model.Uposlenici.Any())
             {
                 <a class="admin-btn-outline"
-                   href="@Url.Action("Index", "Dashboard", new { area = "Admin", id = Model.OdabraniId })">← Back to details</a>
+                   href="@Url.Action("Index", "Osoba", new { id = Model.OdabraniId })">← Back to details</a>
             }
 
-            <form class="admin-form" asp-area="Admin" asp-controller="Dashboard" asp-action="KreirajUposlenika" method="post">
+            <form class="admin-form" asp-controller="Osoba" asp-action="KreirajUposlenika" method="post">
                 @Html.AntiForgeryToken()
                 <div asp-validation-summary="All" class="text-danger mb-2"></div>
 
@@ -283,11 +283,11 @@
         else if (Model.PrikaziUrediForm && Model.Odabrani != null)
         {
             <a class="admin-btn-outline"
-               href="@Url.Action("Index", "Dashboard", new { area = "Admin", id = Model.Odabrani.Id })">← Back to details</a>
+               href="@Url.Action("Index", "Osoba", new { id = Model.Odabrani.Id })">← Back to details</a>
 
             <div class="detail-header">@Model.Odabrani.ImePrezime</div>
 
-            <form class="admin-form" asp-area="Admin" asp-controller="Dashboard" asp-action="UrediUposlenika" method="post">
+            <form class="admin-form" asp-controller="Osoba" asp-action="UrediUposlenika" method="post">
                 @Html.AntiForgeryToken()
                 <input type="hidden" asp-for="Odabrani.Id" />
                 <div asp-validation-summary="All" class="text-danger mb-2"></div>
@@ -354,7 +354,7 @@
             };
 
             <a class="admin-btn-outline"
-               href="@Url.Action("Index", "Dashboard", new { area = "Admin", mode = "novi" })">+ New employee</a>
+               href="@Url.Action("Index", "Osoba", new { mode = "novi" })">+ New employee</a>
 
             <div class="detail-header">@Model.Odabrani.ImePrezime</div>
 
@@ -390,7 +390,7 @@
 
             <div class="detail-actions">
                 <a class="admin-btn"
-                   href="@Url.Action("Index", "Dashboard", new { area = "Admin", id = Model.Odabrani.Id, mode = "edit" })">Edit</a>
+                   href="@Url.Action("Index", "Osoba", new { id = Model.Odabrani.Id, mode = "edit" })">Edit</a>
             </div>
         }
         else
@@ -398,7 +398,7 @@
             <h2 class="admin-title">New employee</h2>
             <p class="text-muted">No employees yet. Add the first employee.</p>
             <a class="admin-btn-outline"
-               href="@Url.Action("Index", "Dashboard", new { area = "Admin", mode = "novi" })">+ Add employee</a>
+               href="@Url.Action("Index", "Osoba", new { mode = "novi" })">+ Add employee</a>
         }
     </div>
 </div>
