@@ -1,103 +1,14 @@
 ﻿@model ETFPay.Models.Predlozak
 
 @{
-    ViewData["Title"] = "DODAVANJE PRETPLATE";
+    ViewData["Title"] = "Add Subscription";
+    ViewData["FormAction"] = "DodavanjePretplate";
+    ViewData["PageTitle"] = "ADD SUBSCRIPTION";
+    ViewData["SubmitButtonText"] = "ADD SUBSCRIPTION";
+    ViewData["ShowPeriod"] = true;
 }
 
-<div class="hero">
-    <div class="container">
-        <h1 class="text-center mb-5" style="font-weight: 700; font-size: 36px;">DODAVANJE PRETPLATE</h1>
-
-        <div class="row justify-content-center">
-            <div class="col-lg-10">
-                @if (!ViewData.ModelState.IsValid)
-                {
-                    <div class="alert alert-danger">
-                        <h4>Greške u validaciji:</h4>
-                        <ul>
-                            @foreach (var modelState in ViewData.ModelState.Values)
-                            {
-                                @foreach (var error in modelState.Errors)
-                                {
-                                    <li>@error.ErrorMessage</li>
-                                }
-                            }
-                        </ul>
-                    </div>
-                }
-
-                <form asp-action="DodavanjePretplate" method="post">
-                    <div asp-validation-summary="All" class="text-danger"></div>
-
-                    <div class="row">
-                        <!-- Left Column -->
-                        <div class="col-md-6">
-                            <div class="mb-4">
-                                <input asp-for="Naziv" class="form-control" placeholder="Naziv:" style="border-radius: 8px; border: 1px solid #ccc; padding: 12px; font-size: 14px; color: #999;" />
-                                <span asp-validation-for="Naziv" class="text-danger"></span>
-                            </div>
-
-                            <div class="mb-4">
-                                <input asp-for="SvrhaUplate" class="form-control" placeholder="Svrha uplate:" style="border-radius: 8px; border: 1px solid #ccc; padding: 12px; font-size: 14px; color: #999;" />
-                                <span asp-validation-for="SvrhaUplate" class="text-danger"></span>
-                            </div>
-
-                            <div class="mb-4">
-                                <input asp-for="Adresa" class="form-control" placeholder="Adresa:" style="border-radius: 8px; border: 1px solid #ccc; padding: 12px; font-size: 14px; color: #999;" />
-                                <span asp-validation-for="Adresa" class="text-danger"></span>
-                            </div>
-
-                            <div class="mb-4">
-                                <input asp-for="Iznos" class="form-control" placeholder="Iznos:" style="border-radius: 8px; border: 1px solid #ccc; padding: 12px; font-size: 14px; color: #999;" />
-                                <span asp-validation-for="Iznos" class="text-danger"></span>
-                            </div>
-                        </div>
-
-                        <!-- Right Column -->
-                        <div class="col-md-6">
-                            <div class="mb-4">
-                                <input asp-for="Primaoc" class="form-control" placeholder="Primaoc:" style="border-radius: 8px; border: 1px solid #ccc; padding: 12px; font-size: 14px; color: #999;" />
-                                <span asp-validation-for="Primaoc" class="text-danger"></span>
-                            </div>
-
-                            <div class="mb-4">
-                                <input asp-for="BrojRacuna" class="form-control" placeholder="Broj racuna:" style="border-radius: 8px; border: 1px solid #ccc; padding: 12px; font-size: 14px; color: #999;" />
-                                <span asp-validation-for="BrojRacuna" class="text-danger"></span>
-                            </div>
-
-                            <div class="mb-4">
-                                <input asp-for="Grad" class="form-control" placeholder="Grad:" style="border-radius: 8px; border: 1px solid #ccc; padding: 12px; font-size: 14px; color: #999;" />
-                                <span asp-validation-for="Grad" class="text-danger"></span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Period Section -->
-                    <div class="row mt-4 mb-5 align-items-center">
-                        <div class="col-md-6">
-                            <label style="font-weight: 600; color: #333; font-size: 14px;">IZVRSI PRETPLATU SVAKIH:</label>
-                        </div>
-                        <div class="col-md-6">
-                            <select asp-for="Period" class="form-control" style="border-radius: 8px; border: 1px solid #ccc; padding: 12px; font-size: 14px;">
-                                <option value="">-- Odaberite Period --</option>
-                                <option value="0">Dnevno</option>
-                                <option value="1">Sedmično</option>
-                                <option value="2">Mjesečno</option>
-                                <option value="3">Godišnje</option>
-                            </select>
-                            <span asp-validation-for="Period" class="text-danger"></span>
-                        </div>
-                    </div>
-
-                    <!-- Submit Button -->
-                    <div class="form-group">
-                        <input type="submit" value="DODAJ PRETPLATU" class="btn" style="background-color: #2d8a6f; color: white; border: none; padding: 12px 40px; font-weight: 600; border-radius: 8px; font-size: 14px;" />
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
+@await Html.PartialAsync("PredlozakForm", Model)
 
 @section Scripts {
     @{
