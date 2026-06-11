@@ -25,8 +25,18 @@ namespace ETFPay.Controllers
         [Authorize(Roles = "Client")]
         public async Task<IActionResult> Transakcija()
         {
+        
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId);
+
+            if (user == null || string.IsNullOrEmpty(user.Racun))
+            {
+                return View(new List<Predlozak>()); 
+            }
+
+        
             var predlosciIzBaze = await _context.Predlozak
-                .Where(p => p.Pretplata == false)
+                .Where(p => p.Pretplata == false && p.Id == userId) //
                 .ToListAsync();
 
             return View(predlosciIzBaze);
