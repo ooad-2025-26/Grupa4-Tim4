@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using ETFPay.Validations;
 
 namespace ETFPay.Models
 {
@@ -9,6 +10,7 @@ namespace ETFPay.Models
         [Key]
         public String Id { get; set; }
         public String Naziv { get; set; }
+        [PrimaocExists]
         public String Primaoc { get; set; }
         public String SvrhaUplate { get; set; }
         public String Adresa { get; set; }
