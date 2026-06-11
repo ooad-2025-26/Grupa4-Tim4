@@ -3,6 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ETFPay.Data;
 using ETFPay.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace ETFPay.Controllers
 {
@@ -35,7 +39,7 @@ namespace ETFPay.Controllers
                 return View(new List<Predlozak>());
             }
 
-            var selectedSubscription = id != null 
+            var selectedSubscription = id != null
                 ? subscriptions.FirstOrDefault(s => s.Id == id)
                 : subscriptions.FirstOrDefault();
 
@@ -102,7 +106,7 @@ namespace ETFPay.Controllers
                 return View(new List<Predlozak>());
             }
 
-            var selectedTemplate = id != null 
+            var selectedTemplate = id != null
                 ? templates.FirstOrDefault(t => t.Id == id)
                 : templates.FirstOrDefault();
 
@@ -178,8 +182,6 @@ namespace ETFPay.Controllers
         }
 
         // POST: Predlozak/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin,Uposlenik")]
@@ -212,8 +214,6 @@ namespace ETFPay.Controllers
         }
 
         // POST: Predlozak/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin,Uposlenik")]
@@ -289,6 +289,41 @@ namespace ETFPay.Controllers
             }
 
             return RedirectToAction(nameof(Index));
+        }
+
+       
+        [HttpPost]
+        [Authorize(Roles = "Client")]
+        public async Task<IActionResult> SaveTemplate([FromBody] Predlozak predlozak)
+        {
+            if (predlozak == null)
+            {
+                return BadRequest("Podaci nisu ispravno poslani.");
+            }
+
+            ModelState.Remove("Id");
+            ModelState.Remove("Pretplata");
+            ModelState.Remove("Period");
+
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    predlozak.Id = Guid.NewGuid().ToString();
+                    predlozak.Pretplata = false;
+
+                    _context.Add(predlozak);
+                    await _context.SaveChangesAsync();
+
+                    return Ok(new { message = "Predložak uspješno spasen u bazu!" });
+                }
+
+                return BadRequest("Podaci nisu validni.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Greška prilikom spasavanja u bazu: " + ex.Message);
+            }
         }
 
         private bool PredlozakExists(string id)
