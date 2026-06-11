@@ -23,6 +23,7 @@ namespace ETFPay.Controllers
         }
 
         [Authorize(Roles = "Client")]
+        [Route("Transakcija")]
         public async Task<IActionResult> Transakcija()
         {
         
