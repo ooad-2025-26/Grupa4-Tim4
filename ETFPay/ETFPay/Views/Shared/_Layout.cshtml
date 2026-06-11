@@ -1,6 +1,12 @@
 ﻿@{
+    var currentArea = ViewContext.RouteData.Values["area"]?.ToString();
     var currentController = ViewContext.RouteData.Values["Controller"]?.ToString();
     var currentAction = ViewContext.RouteData.Values["Action"]?.ToString();
+    var isHome = string.IsNullOrEmpty(currentArea) && currentController == "Home" && currentAction == "Index";
+    var isPrivacy = string.IsNullOrEmpty(currentArea) && currentController == "Home" && currentAction == "Privacy";
+    var isZahtjevi = currentController == "Osoba" && currentAction == "ZahtjeviZaRacun";
+    var isAdministration = currentArea == "Admin" && currentController == "Dashboard" && currentAction == "Index";
+    var isUserSearch = currentArea == "Admin" && currentController == "Dashboard" && currentAction == "UserSearch";
     var isPretplate = currentController == "Predlozak" && (currentAction == "PretplataView" || currentAction == "DodavanjePretplate");
     var isPredlosci = currentController == "Predlozak" && (currentAction == "PredlozakView" || currentAction == "DodavanjePredlozaka");
     var isHistory = currentController == "Transakcija" && currentAction == "MojeTransakcije";
@@ -35,29 +41,31 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link @(isHome ? "nav-link-active" : "text-dark")" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            <a class="nav-link @(isPrivacy ? "nav-link-active" : "text-dark")" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
-                        @if (User.IsInRole("Admin"))
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Administration</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">User Search</a>
-                            </li>
-                        }
                         @if (User.IsInRole("Uposlenik"))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Osoba" asp-action="ZahtjeviZaRacun">Zahtjevi za Račun</a>
+                                <a class="nav-link @(isZahtjevi ? "nav-link-active" : "text-dark")" asp-controller="Osoba" asp-action="ZahtjeviZaRacun">Zahtjevi za Račun</a>
                             </li>
                         }
                     </ul>
 
                     <div class="d-flex align-items-center">
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <ul class="navbar-nav me-3 gap-2">
+                                <li class="nav-item">
+                                    <a class="nav-link @(isAdministration ? "nav-link-active" : "text-dark")" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Administration</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link @(isUserSearch ? "nav-link-active" : "text-dark")" asp-area="Admin" asp-controller="Dashboard" asp-action="UserSearch">User Search</a>
+                                </li>
+                            </ul>
+                        }
                         @if (User.Identity.IsAuthenticated && User.IsInRole("Client") && ViewBag.RacunAktivan as bool? == true)
                         {
                             <ul class="navbar-nav me-3 gap-2">

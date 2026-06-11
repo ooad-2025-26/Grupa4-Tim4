@@ -1,0 +1,298 @@
+@model ETFPay.Areas.Admin.Controllers.DashboardController.UserSearchViewModel
+@{
+    ViewData["Title"] = "Pretraga";
+}
+
+<style>
+    .user-search-page {
+        padding: 24px 8px 48px;
+    }
+
+    .search-toolbar {
+        display: flex;
+        gap: 48px;
+        margin-bottom: 2rem;
+        align-items: flex-start;
+    }
+
+    .search-toolbar-section {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .search-section-title {
+        font-size: 1.25rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        margin-bottom: 0.75rem;
+        color: #111;
+    }
+
+    .admin-page {
+        display: flex;
+        gap: 48px;
+        align-items: flex-start;
+    }
+
+    @@media (max-width: 768px) {
+        .search-toolbar,
+        .admin-page {
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .detail-row {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .detail-label {
+            min-width: 0;
+        }
+    }
+
+    .admin-col {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .admin-title {
+        font-size: 1.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        margin-bottom: 1.25rem;
+        color: #111;
+    }
+
+    .admin-list-head {
+        display: flex;
+        justify-content: space-between;
+        font-weight: 600;
+        color: #666;
+        margin-bottom: 0.75rem;
+        padding: 0 0.25rem;
+    }
+
+    .admin-list {
+        max-height: 520px;
+        overflow-y: auto;
+        padding-right: 4px;
+    }
+
+    .admin-list-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #ececec;
+        border-radius: 10px;
+        padding: 14px 16px;
+        margin-bottom: 10px;
+        text-decoration: none;
+        color: #333;
+        transition: background 0.2s ease;
+        cursor: pointer;
+    }
+
+    .admin-list-item:hover {
+        background: #e2e2e2;
+        color: #333;
+    }
+
+    .admin-list-item.active {
+        background: #1f6b60;
+        color: #fff;
+    }
+
+    .admin-list-item.active span:last-child {
+        color: #e8f5f2;
+    }
+
+    .admin-form .form-control,
+    .admin-form .form-select {
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        padding: 12px 14px;
+        margin-bottom: 12px;
+        font-size: 0.95rem;
+        width: 100%;
+    }
+
+    .admin-form .form-control::placeholder {
+        color: #999;
+    }
+
+    .admin-btn {
+        background: #1f6b60;
+        color: #fff;
+        border: 3px solid #fff;
+        border-radius: 10px;
+        padding: 14px 48px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    }
+
+    .admin-btn:hover {
+        background: #164d43;
+        color: #fff;
+        border-color: #fff;
+    }
+
+    .detail-header {
+        background: #1f6b60;
+        color: #fff;
+        border-radius: 10px;
+        padding: 16px 20px;
+        font-weight: 800;
+        text-transform: uppercase;
+        margin-bottom: 1.25rem;
+        font-size: 1.1rem;
+    }
+
+    .detail-row {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 12px;
+    }
+
+    .detail-label {
+        min-width: 140px;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .detail-value {
+        flex: 1;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        padding: 12px 14px;
+        background: #f5f5f5;
+        color: #333;
+        font-size: 0.95rem;
+    }
+</style>
+
+<div class="user-search-page">
+    <div class="search-toolbar">
+        <div class="search-toolbar-section">
+            <h3 class="search-section-title">Pretraga</h3>
+            <form class="admin-form" method="get" asp-area="Admin" asp-controller="Dashboard" asp-action="UserSearch">
+                <input type="hidden" name="filter" value="@Model.Filter" />
+                <input type="hidden" name="id" value="@Model.OdabraniId" />
+                <input type="text" name="q" value="@Model.Pretraga" class="form-control" placeholder="Unesite klijenta" />
+                <button type="submit" class="admin-btn">Pretraži</button>
+            </form>
+        </div>
+
+        <div class="search-toolbar-section">
+            <h3 class="search-section-title">Filter</h3>
+            <form class="admin-form" method="get" asp-area="Admin" asp-controller="Dashboard" asp-action="UserSearch">
+                <input type="hidden" name="q" value="@Model.Pretraga" />
+                <input type="hidden" name="id" value="@Model.OdabraniId" />
+                <select name="filter" class="form-select">
+                    <option value="">Odaberite filter</option>
+                    <option value="aktivan" selected="@(Model.Filter == "aktivan" ? "selected" : null)">Aktivan račun</option>
+                    <option value="neaktivan" selected="@(Model.Filter == "neaktivan" ? "selected" : null)">Neaktivan račun</option>
+                    <option value="pozitivno-stanje" selected="@(Model.Filter == "pozitivno-stanje" ? "selected" : null)">Stanje veće od 0</option>
+                    <option value="nulto-stanje" selected="@(Model.Filter == "nulto-stanje" ? "selected" : null)">Stanje 0 KM</option>
+                    <option value="ima-telefon" selected="@(Model.Filter == "ima-telefon" ? "selected" : null)">Ima broj telefona</option>
+                    <option value="nema-telefon" selected="@(Model.Filter == "nema-telefon" ? "selected" : null)">Nema broj telefona</option>
+                </select>
+                <button type="submit" class="admin-btn">Filtriraj</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="admin-page">
+        <div class="admin-col">
+            <h2 class="admin-title">Klijenti</h2>
+
+            <div class="admin-list-head">
+                <span>Klijent</span>
+                <span>Broj računa</span>
+            </div>
+
+            <div class="admin-list">
+                @if (Model.Klijenti.Any())
+                {
+                    @foreach (var k in Model.Klijenti)
+                    {
+                        <a class="admin-list-item @(k.Id == Model.OdabraniId ? "active" : "")"
+                           asp-area="Admin"
+                           asp-controller="Dashboard"
+                           asp-action="UserSearch"
+                           asp-route-q="@Model.Pretraga"
+                           asp-route-filter="@Model.Filter"
+                           asp-route-id="@k.Id">
+                            <span>@k.PunoIme</span>
+                            <span>@k.BrojRacuna</span>
+                        </a>
+                    }
+                }
+                else
+                {
+                    <div class="text-muted py-3">Nema klijenata za prikaz.</div>
+                }
+            </div>
+        </div>
+
+        <div class="admin-col">
+            @if (Model.Odabrani != null)
+            {
+                <div class="detail-header">@Model.Odabrani.ImePrezime</div>
+
+                <div class="detail-row">
+                    <span class="detail-label">Email</span>
+                    <div class="detail-value">@Model.Odabrani.Email</div>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">Broj telefona</span>
+                    <div class="detail-value">@(string.IsNullOrWhiteSpace(Model.Odabrani.BrojTelefona) ? "—" : Model.Odabrani.BrojTelefona)</div>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">JMBG</span>
+                    <div class="detail-value">@Model.Odabrani.Jmbg</div>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">Datum rođenja</span>
+                    <div class="detail-value">@Model.Odabrani.DatumRodjenja.ToString("dd.MM.yyyy")</div>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">Broj računa</span>
+                    <div class="detail-value">@Model.Odabrani.BrojRacuna</div>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">IBAN</span>
+                    <div class="detail-value">@Model.Odabrani.Iban</div>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">Stanje</span>
+                    <div class="detail-value">@Model.Odabrani.Stanje.ToString("N2") KM</div>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">Status računa</span>
+                    <div class="detail-value">@(Model.Odabrani.Aktivan ? "Aktivan" : "Neaktivan")</div>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">Datum kreiranja</span>
+                    <div class="detail-value">@(Model.Odabrani.DatumKreiranjaRacuna?.ToString("dd.MM.yyyy") ?? "—")</div>
+                </div>
+            }
+            else
+            {
+                <h2 class="admin-title">Detalji klijenta</h2>
+                <p class="text-muted">Odaberite klijenta iz liste za prikaz podataka.</p>
+            }
+        </div>
+    </div>
+</div>
