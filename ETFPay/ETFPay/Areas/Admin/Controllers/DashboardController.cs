@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 namespace ETFPay.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     public class DashboardController : Controller
     {
         private static readonly string[] DozvoljeneUloge =
@@ -30,28 +30,31 @@ namespace ETFPay.Areas.Admin.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index(string? id, string? mode)
         {
             return View(await BuildViewModelAsync(id, mode, new NoviUposlenikForm(), null));
         }
 
         [HttpGet]
-        public async Task<IActionResult> UserSearch(string? q, string? filter, string? id)
+        [Authorize(Roles = "Admin,Uposlenik")]
+        public async Task<IActionResult> UserSearch(string? q, string? filter, string? sort, string? sortDir, string? id)
         {
-            return View(await BuildUserSearchViewModelAsync(q, filter, id));
+            return View(await BuildUserSearchViewModelAsync(q, filter, sort, sortDir, id));
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> KreirajUposlenika([Bind(Prefix = "Novi")] NoviUposlenikForm novi)
         {
             var dijelovi = (novi.ImePrezime ?? "").Trim().Split(' ', 2, StringSplitOptions.RemoveEmptyEntries);
             if (dijelovi.Length < 2)
-                ModelState.AddModelError("Novi.ImePrezime", "Unesite ime i prezime.");
+                ModelState.AddModelError("Novi.ImePrezime", "Enter first and last name.");
 
             var uloga = string.IsNullOrWhiteSpace(novi.Uloga) ? "Uposlenik" : novi.Uloga.Trim();
             if (!DozvoljeneUloge.Contains(uloga))
-                ModelState.AddModelError("Novi.Uloga", "Odabrana uloga nije validna.");
+                ModelState.AddModelError("Novi.Uloga", "Selected role is not valid.");
 
             if (!ModelState.IsValid)
                 return View("Index", await BuildViewModelAsync(null, "novi", novi, null));
@@ -59,7 +62,7 @@ namespace ETFPay.Areas.Admin.Controllers
             var username = novi.Username.Trim();
             if (await _userManager.FindByNameAsync(username) != null)
             {
-                ModelState.AddModelError("Novi.Username", "Username je već zauzet.");
+                ModelState.AddModelError("Novi.Username", "Username is already taken.");
                 return View("Index", await BuildViewModelAsync(null, "novi", novi, null));
             }
 
@@ -97,12 +100,13 @@ namespace ETFPay.Areas.Admin.Controllers
                 return View("Index", await BuildViewModelAsync(null, "novi", novi, null));
             }
 
-            TempData["Uspjeh"] = "Uposlenik je uspješno dodan.";
+            TempData["Success"] = "Employee added successfully.";
             return RedirectToAction(nameof(Index), new { area = "Admin", id = user.Id });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UrediUposlenika([Bind(Prefix = "Odabrani")] UrediUposlenikForm odabrani)
         {
             var user = await _userManager.FindByIdAsync(odabrani.Id);
@@ -111,16 +115,16 @@ namespace ETFPay.Areas.Admin.Controllers
 
             var dijelovi = (odabrani.ImePrezime ?? "").Trim().Split(' ', 2, StringSplitOptions.RemoveEmptyEntries);
             if (dijelovi.Length < 2)
-                ModelState.AddModelError("Odabrani.ImePrezime", "Unesite ime i prezime.");
+                ModelState.AddModelError("Odabrani.ImePrezime", "Enter first and last name.");
 
             var uloga = string.IsNullOrWhiteSpace(odabrani.Uloga) ? "Uposlenik" : odabrani.Uloga.Trim();
             if (!DozvoljeneUloge.Contains(uloga))
-                ModelState.AddModelError("Odabrani.Uloga", "Odabrana uloga nije validna.");
+                ModelState.AddModelError("Odabrani.Uloga", "Selected role is not valid.");
 
             var noviUsername = odabrani.Username.Trim();
             var postojeci = await _userManager.FindByNameAsync(noviUsername);
             if (postojeci != null && postojeci.Id != user.Id)
-                ModelState.AddModelError("Odabrani.Username", "Username je već zauzet.");
+                ModelState.AddModelError("Odabrani.Username", "Username is already taken.");
 
             if (!ModelState.IsValid)
                 return View("Index", await BuildViewModelAsync(odabrani.Id, "edit", new NoviUposlenikForm(), odabrani));
@@ -164,12 +168,13 @@ namespace ETFPay.Areas.Admin.Controllers
 
             await _userManager.AddToRoleAsync(user, uloga);
 
-            TempData["Uspjeh"] = "Podaci uposlenika su izmijenjeni.";
+            TempData["Success"] = "Employee updated successfully.";
             return RedirectToAction(nameof(Index), new { area = "Admin", id = user.Id });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> ObrisiUposlenika(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
@@ -179,19 +184,69 @@ namespace ETFPay.Areas.Admin.Controllers
             var trenutni = await _userManager.GetUserAsync(User);
             if (trenutni?.Id == user.Id)
             {
-                TempData["Greska"] = "Ne možete obrisati vlastiti nalog.";
+                TempData["Error"] = "You cannot delete your own account.";
                 return RedirectToAction(nameof(Index), new { area = "Admin", id });
             }
 
             var result = await _userManager.DeleteAsync(user);
             if (!result.Succeeded)
             {
-                TempData["Greska"] = "Brisanje nije uspjelo.";
+                TempData["Error"] = "Delete failed.";
                 return RedirectToAction(nameof(Index), new { area = "Admin", id });
             }
 
-            TempData["Uspjeh"] = "Uposlenik je obrisan.";
+            TempData["Success"] = "Employee deleted successfully.";
             return RedirectToAction(nameof(Index), new { area = "Admin" });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Uposlenik")]
+        public async Task<IActionResult> ObrisiKlijenta(string id, string? q, string? filter, string? sort, string? sortDir)
+        {
+            var redirectParams = new { area = "Admin", q, filter, sort, sortDir };
+
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+                return NotFound();
+
+            if (!await _userManager.IsInRoleAsync(user, "Client"))
+            {
+                TempData["Error"] = "Only client accounts can be deleted from this page.";
+                return RedirectToAction(nameof(UserSearch), redirectParams);
+            }
+
+            var trenutni = await _userManager.GetUserAsync(User);
+            if (trenutni?.Id == user.Id)
+            {
+                TempData["Error"] = "You cannot delete your own account.";
+                return RedirectToAction(nameof(UserSearch), new { area = "Admin", q, filter, sort, sortDir, id });
+            }
+
+            if (!string.IsNullOrEmpty(user.Racun))
+            {
+                var racunId = user.Racun;
+                var transakcije = await _context.Transakcija
+                    .Where(t => t.Primaoc == racunId || t.Posiljaoc == racunId)
+                    .ToListAsync();
+                _context.Transakcija.RemoveRange(transakcije);
+
+                var racun = await _context.Racun.FindAsync(racunId);
+                if (racun != null)
+                    _context.Racun.Remove(racun);
+
+                await _context.SaveChangesAsync();
+            }
+
+            var result = await _userManager.DeleteAsync(user);
+            if (!result.Succeeded)
+            {
+                TempData["Error"] = "Delete failed.";
+                return RedirectToAction(nameof(UserSearch), new { area = "Admin", q, filter, sort, sortDir, id });
+            }
+
+            TempData["Success"] = "Client deleted successfully.";
+            return RedirectToAction(nameof(UserSearch), redirectParams);
         }
 
         private async Task<AdminDashboardViewModel> BuildViewModelAsync(
@@ -273,23 +328,24 @@ namespace ETFPay.Areas.Admin.Controllers
             };
         }
 
-        private async Task<UserSearchViewModel> BuildUserSearchViewModelAsync(string? q, string? filter, string? id)
+        private async Task<UserSearchViewModel> BuildUserSearchViewModelAsync(string? q, string? filter, string? sort, string? sortDir, string? id)
         {
             var klijenti = await _userManager.GetUsersInRoleAsync("Client");
             var racuni = await _context.Racun.ToDictionaryAsync(r => r.Id);
 
             var items = new List<KlijentListItem>();
-            foreach (var user in klijenti.OrderBy(u => u.Prezime).ThenBy(u => u.Ime))
+            foreach (var user in klijenti)
             {
                 racuni.TryGetValue(user.Racun ?? "", out var racun);
                 items.Add(new KlijentListItem
                 {
                     Id = user.Id,
+                    Ime = user.Ime,
+                    Prezime = user.Prezime,
                     PunoIme = $"{user.Ime} {user.Prezime}",
                     BrojRacuna = racun?.brojRacuna ?? "-",
                     Aktivan = racun?.Aktivan ?? false,
-                    Stanje = racun?.Stanje ?? 0,
-                    ImaTelefon = !string.IsNullOrWhiteSpace(user.PhoneNumber)
+                    Stanje = racun?.Stanje ?? 0
                 });
             }
 
@@ -311,11 +367,14 @@ namespace ETFPay.Areas.Admin.Controllers
                     "neaktivan" => items.Where(k => !k.Aktivan && k.BrojRacuna != "-").ToList(),
                     "pozitivno-stanje" => items.Where(k => k.Stanje > 0).ToList(),
                     "nulto-stanje" => items.Where(k => k.Stanje == 0).ToList(),
-                    "ima-telefon" => items.Where(k => k.ImaTelefon).ToList(),
-                    "nema-telefon" => items.Where(k => !k.ImaTelefon).ToList(),
                     _ => items
                 };
             }
+
+            var sortKriterij = string.IsNullOrWhiteSpace(sort) ? "prezime" : sort.Trim().ToLower();
+            var sortAscending = !string.Equals(sortDir, "desc", StringComparison.OrdinalIgnoreCase);
+            if (sortKriterij is "ime" or "prezime" or "stanje")
+                QuickSortKlijente(items, sortKriterij, sortAscending);
 
             var resolvedId = !string.IsNullOrEmpty(id) && items.Any(k => k.Id == id)
                 ? id
@@ -350,19 +409,69 @@ namespace ETFPay.Areas.Admin.Controllers
                 Klijenti = items,
                 Pretraga = q,
                 Filter = filter,
+                Sort = sortKriterij,
+                SortDirection = sortAscending ? "asc" : "desc",
                 OdabraniId = resolvedId,
                 Odabrani = odabrani
             };
         }
 
+        private static void QuickSortKlijente(List<KlijentListItem> items, string sortBy, bool ascending)
+        {
+            if (items.Count <= 1)
+                return;
+
+            QuickSortKlijente(items, 0, items.Count - 1, sortBy, ascending);
+        }
+
+        private static void QuickSortKlijente(List<KlijentListItem> items, int low, int high, string sortBy, bool ascending)
+        {
+            if (low >= high)
+                return;
+
+            var pivotIndex = PartitionKlijente(items, low, high, sortBy, ascending);
+            QuickSortKlijente(items, low, pivotIndex - 1, sortBy, ascending);
+            QuickSortKlijente(items, pivotIndex + 1, high, sortBy, ascending);
+        }
+
+        private static int PartitionKlijente(List<KlijentListItem> items, int low, int high, string sortBy, bool ascending)
+        {
+            var pivot = items[high];
+            var i = low - 1;
+
+            for (var j = low; j < high; j++)
+            {
+                if (UporediKlijente(items[j], pivot, sortBy, ascending) <= 0)
+                {
+                    i++;
+                    (items[i], items[j]) = (items[j], items[i]);
+                }
+            }
+
+            (items[i + 1], items[high]) = (items[high], items[i + 1]);
+            return i + 1;
+        }
+
+        private static int UporediKlijente(KlijentListItem a, KlijentListItem b, string sortBy, bool ascending)
+        {
+            var result = sortBy switch
+            {
+                "ime" => string.Compare(a.Ime, b.Ime, StringComparison.OrdinalIgnoreCase),
+                "stanje" => a.Stanje.CompareTo(b.Stanje),
+                _ => string.Compare(a.Prezime, b.Prezime, StringComparison.OrdinalIgnoreCase)
+            };
+
+            return ascending ? result : -result;
+        }
+
         private static string PrikaziUlogu(string? uloga) =>
             uloga switch
             {
-                "Uposlenik" => "Operater",
-                "Zastitar" => "Zaštitar",
-                "Direktor" => "Direktor",
-                "Domar" => "Domar",
-                "Blagajnik" => "Blagajnik",
+                "Uposlenik" => "Employee",
+                "Zastitar" => "Security",
+                "Direktor" => "Director",
+                "Domar" => "Janitor",
+                "Blagajnik" => "Cashier",
                 "Admin" => "Admin",
                 _ => uloga ?? "-"
             };
@@ -387,23 +496,23 @@ namespace ETFPay.Areas.Admin.Controllers
         {
             public string Id { get; set; } = "";
 
-            [Required(ErrorMessage = "Ime i prezime je obavezno.")]
+            [Required(ErrorMessage = "Full name is required.")]
             public string ImePrezime { get; set; } = "";
 
-            [Required(ErrorMessage = "Uloga je obavezna.")]
+            [Required(ErrorMessage = "Role is required.")]
             public string Uloga { get; set; } = "Uposlenik";
 
             public DateOnly? DatumZaposlenja { get; set; }
 
-            [Range(0, double.MaxValue, ErrorMessage = "Plata mora biti pozitivan broj.")]
+            [Range(0, double.MaxValue, ErrorMessage = "Salary must be a positive number.")]
             public double? Plata { get; set; }
 
             public string? BrojTelefona { get; set; }
 
-            [Required(ErrorMessage = "Username je obavezan.")]
+            [Required(ErrorMessage = "Username is required.")]
             public string Username { get; set; } = "";
 
-            [MinLength(6, ErrorMessage = "Šifra mora imati najmanje 6 znakova.")]
+            [MinLength(6, ErrorMessage = "Password must be at least 6 characters.")]
             [DataType(DataType.Password)]
             public string? NovaSifra { get; set; }
         }
@@ -417,22 +526,22 @@ namespace ETFPay.Areas.Admin.Controllers
 
         public class NoviUposlenikForm
         {
-            [Required(ErrorMessage = "Ime i prezime je obavezno.")]
+            [Required(ErrorMessage = "Full name is required.")]
             public string ImePrezime { get; set; } = "";
 
-            [Required(ErrorMessage = "Uloga je obavezna.")]
+            [Required(ErrorMessage = "Role is required.")]
             public string Uloga { get; set; } = "Uposlenik";
 
-            [Range(0, double.MaxValue, ErrorMessage = "Plata mora biti pozitivan broj.")]
+            [Range(0, double.MaxValue, ErrorMessage = "Salary must be a positive number.")]
             public double? Plata { get; set; }
 
             public string? BrojTelefona { get; set; }
 
-            [Required(ErrorMessage = "Username je obavezan.")]
+            [Required(ErrorMessage = "Username is required.")]
             public string Username { get; set; } = "";
 
-            [Required(ErrorMessage = "Šifra je obavezna.")]
-            [MinLength(6, ErrorMessage = "Šifra mora imati najmanje 6 znakova.")]
+            [Required(ErrorMessage = "Password is required.")]
+            [MinLength(6, ErrorMessage = "Password must be at least 6 characters.")]
             [DataType(DataType.Password)]
             public string Sifra { get; set; } = "";
         }
@@ -442,6 +551,8 @@ namespace ETFPay.Areas.Admin.Controllers
             public List<KlijentListItem> Klijenti { get; set; } = new();
             public string? Pretraga { get; set; }
             public string? Filter { get; set; }
+            public string Sort { get; set; } = "prezime";
+            public string SortDirection { get; set; } = "asc";
             public string? OdabraniId { get; set; }
             public KlijentDetalji? Odabrani { get; set; }
         }
@@ -464,11 +575,12 @@ namespace ETFPay.Areas.Admin.Controllers
         public class KlijentListItem
         {
             public string Id { get; set; } = "";
+            public string Ime { get; set; } = "";
+            public string Prezime { get; set; } = "";
             public string PunoIme { get; set; } = "";
             public string BrojRacuna { get; set; } = "";
             public bool Aktivan { get; set; }
             public double Stanje { get; set; }
-            public bool ImaTelefon { get; set; }
         }
     }
 }

@@ -29,6 +29,9 @@ builder.Services.AddRazorPages();
 
 builder.Services.AddHttpClient<KursService>();
 
+builder.Services.AddScoped<IPretplateService, PretplateService>();
+builder.Services.AddHostedService<PretplatePaymentBackgroundService>();
+
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
