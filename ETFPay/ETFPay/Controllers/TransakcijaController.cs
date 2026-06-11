@@ -6,6 +6,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using System;
 
 namespace ETFPay.Controllers
 {
@@ -17,19 +21,34 @@ namespace ETFPay.Controllers
         {
             _context = context;
         }
+
         [Authorize(Roles = "Client")]
-        public IActionResult Transakcija()
+        [Route("Transakcija")]
+        public async Task<IActionResult> Transakcija()
         {
-            return View();
+        
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId);
+
+            if (user == null || string.IsNullOrEmpty(user.Racun))
+            {
+                return View(new List<Predlozak>()); 
+            }
+
+        
+            var predlosciIzBaze = await _context.Predlozak
+                .Where(p => p.Pretplata == false && p.Id == userId) //
+                .ToListAsync();
+
+            return View(predlosciIzBaze);
         }
-        // GET: Transakcija
+
         [Authorize(Roles = "Admin,Uposlenik")]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Transakcija.ToListAsync());
         }
 
-        // GET: Transakcija/Details/5
         [Authorize(Roles = "Admin,Uposlenik")]
         public async Task<IActionResult> Details(string id)
         {
@@ -48,16 +67,12 @@ namespace ETFPay.Controllers
             return View(transakcija);
         }
 
-        // GET: Transakcija/Create
         [Authorize(Roles = "Admin,Uposlenik")]
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Transakcija/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin,Uposlenik")]
@@ -72,7 +87,6 @@ namespace ETFPay.Controllers
             return View(transakcija);
         }
 
-        // GET: Transakcija/Edit/5
         [Authorize(Roles = "Admin,Uposlenik")]
         public async Task<IActionResult> Edit(string id)
         {
@@ -89,9 +103,6 @@ namespace ETFPay.Controllers
             return View(transakcija);
         }
 
-        // POST: Transakcija/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin,Uposlenik")]
@@ -125,7 +136,6 @@ namespace ETFPay.Controllers
             return View(transakcija);
         }
 
-        // GET: Transakcija/Delete/5
         [Authorize(Roles = "Admin,Uposlenik")]
         public async Task<IActionResult> Delete(string id)
         {
@@ -144,7 +154,6 @@ namespace ETFPay.Controllers
             return View(transakcija);
         }
 
-        // POST: Transakcija/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin,Uposlenik")]
@@ -201,7 +210,7 @@ namespace ETFPay.Controllers
         public async Task<IActionResult> CreateTransaction(CreateTransactionRequest request)
         {
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+                return BadRequest(new { message = "Invalid data submitted." });
 
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userId))
@@ -212,22 +221,25 @@ namespace ETFPay.Controllers
                 return Unauthorized();
 
             if (request.Amount <= 0)
-                return BadRequest("Amount must be greater than 0");
+                return BadRequest(new { message = "Amount must be greater than 0." });
 
             var senderAccount = await _context.Racun
                 .FirstOrDefaultAsync(r => r.Id == sender.Racun);
 
             if (senderAccount == null)
-                return BadRequest("Sender account not found");
+                return BadRequest(new { message = "Sender account not found." });
 
             var recipientAccount = await _context.Racun
                 .FirstOrDefaultAsync(a => a.brojRacuna == request.RecipientAccountNumber);
 
             if (recipientAccount == null)
-                return BadRequest("Recipient account not found");
+                return BadRequest(new { message = "Recipient account not found." });
+
+            if (senderAccount.Id == recipientAccount.Id || senderAccount.brojRacuna == recipientAccount.brojRacuna)
+                return BadRequest(new { message = "You cannot send money to your own account." });
 
             if (senderAccount.Stanje < request.Amount)
-                return BadRequest("Insufficient funds");
+                return BadRequest(new { message = "Insufficient funds." });
 
             senderAccount.Stanje -= request.Amount;
             recipientAccount.Stanje += request.Amount;

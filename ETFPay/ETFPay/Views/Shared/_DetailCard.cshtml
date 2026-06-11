@@ -1,7 +1,7 @@
 @model ETFPay.Models.Predlozak
 
 @{
-    var headerText = ViewBag.HeaderText ?? "DETALJI";
+    var headerText = ViewBag.HeaderText ?? "Details";
 }
 
 <div style="border-radius: 8px; overflow: hidden;">
@@ -11,28 +11,28 @@
 
     <div style="background-color: #f8f9fa; padding: 20px; border-radius: 0 0 8px 8px;">
         <div class="mb-3" style="display: flex; justify-content: space-between;">
-            <strong>Broj racuna</strong>
-            <div style="font-size: 18px;">@Model.BrojRacuna</div>
+            <strong>Account number</strong>
+            <div style="font-size: 18px;">@Model.Primaoc</div>
         </div>
 
         <hr>
 
         <div class="mb-3" style="display: flex; justify-content: space-between;">
-            <strong>Iznos</strong>
+            <strong>Amount</strong>
             <div style="font-size: 18px;">@Model.Iznos.ToString("F2") $</div>
         </div>
 
         <hr>
 
         <div class="mb-3" style="display: flex; justify-content: space-between;">
-            <strong>Svrha uplate</strong>
+            <strong>Payment purpose</strong>
             <div style="font-size: 18px;">@Model.SvrhaUplate</div>
         </div>
 
         <hr>
 
         <div class="mb-3" style="display: flex; justify-content: space-between;">
-            <strong>Datum transakcije</strong>
+            <strong>Transaction date</strong>
             <div style="font-size: 18px;">@DateTime.Now.ToString("dd/MM/yyyy")</div>
         </div>
     </div>

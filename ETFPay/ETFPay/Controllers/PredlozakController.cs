@@ -1,33 +1,44 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ETFPay.Data;
 using ETFPay.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace ETFPay.Controllers
 {
     public class PredlozakController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<Osoba> _userManager;
 
-        public PredlozakController(ApplicationDbContext context)
+        public PredlozakController(ApplicationDbContext context, UserManager<Osoba> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
-        // GET: Predlozak
         [Authorize(Roles = "Admin,Uposlenik")]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Predlozak.ToListAsync());
         }
 
-        // GET: Predlozak/PretplataView
         [Authorize(Roles = "Client")]
         public async Task<IActionResult> PretplataView(string id)
         {
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null)
+            {
+                return Unauthorized();
+            }
+
             var subscriptions = await _context.Predlozak
-                .Where(p => p.Pretplata == true)
+                .Where(p => p.Pretplata == true && p.BrojRacuna == currentUser.Racun)
                 .ToListAsync();
 
             if (!subscriptions.Any())
@@ -35,7 +46,7 @@ namespace ETFPay.Controllers
                 return View(new List<Predlozak>());
             }
 
-            var selectedSubscription = id != null 
+            var selectedSubscription = id != null
                 ? subscriptions.FirstOrDefault(s => s.Id == id)
                 : subscriptions.FirstOrDefault();
 
@@ -47,21 +58,20 @@ namespace ETFPay.Controllers
             return View(subscriptions);
         }
 
-        // GET: Predlozak/DodavanjePretplate
         [Authorize(Roles = "Client")]
         public IActionResult DodavanjePretplate()
         {
             return View();
         }
 
-        // POST: Predlozak/DodavanjePretplate
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Client")]
-        public async Task<IActionResult> DodavanjePretplate([Bind("Naziv,Primaoc,SvrhaUplate,Adresa,Grad,BrojRacuna,Iznos,Period")] Predlozak predlozak)
+        public async Task<IActionResult> DodavanjePretplate([Bind("Naziv,Primaoc,SvrhaUplate,Adresa,Grad,Iznos,Period")] Predlozak predlozak)
         {
             ModelState.Remove("Id");
             ModelState.Remove("Pretplata");
+            ModelState.Remove("BrojRacuna");
 
             if (string.IsNullOrEmpty(Request.Form["Period"]))
             {
@@ -73,8 +83,15 @@ namespace ETFPay.Controllers
             {
                 if (ModelState.IsValid)
                 {
+                    var currentUser = await _userManager.GetUserAsync(User);
+                    if (currentUser == null)
+                    {
+                        return Unauthorized();
+                    }
+
                     predlozak.Id = Guid.NewGuid().ToString();
                     predlozak.Pretplata = true;
+                    predlozak.BrojRacuna = currentUser.Racun;
 
                     _context.Add(predlozak);
                     await _context.SaveChangesAsync();
@@ -89,12 +106,17 @@ namespace ETFPay.Controllers
             return View(predlozak);
         }
 
-        // GET: Predlozak/PredlozakView
         [Authorize(Roles = "Client")]
         public async Task<IActionResult> PredlozakView(string id)
         {
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null)
+            {
+                return Unauthorized();
+            }
+
             var templates = await _context.Predlozak
-                .Where(p => p.Pretplata == false)
+                .Where(p => p.Pretplata == false && p.BrojRacuna == currentUser.Racun)
                 .ToListAsync();
 
             if (!templates.Any())
@@ -102,7 +124,7 @@ namespace ETFPay.Controllers
                 return View(new List<Predlozak>());
             }
 
-            var selectedTemplate = id != null 
+            var selectedTemplate = id != null
                 ? templates.FirstOrDefault(t => t.Id == id)
                 : templates.FirstOrDefault();
 
@@ -114,29 +136,35 @@ namespace ETFPay.Controllers
             return View(templates);
         }
 
-        // GET: Predlozak/DodavanjePredlozaka
         [Authorize(Roles = "Client")]
         public IActionResult DodavanjePredlozaka()
         {
             return View();
         }
 
-        // POST: Predlozak/DodavanjePredlozaka
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Client")]
-        public async Task<IActionResult> DodavanjePredlozaka([Bind("Naziv,Primaoc,SvrhaUplate,Adresa,Grad,BrojRacuna,Iznos")] Predlozak predlozak)
+        public async Task<IActionResult> DodavanjePredlozaka([Bind("Naziv,Primaoc,SvrhaUplate,Adresa,Grad,Iznos")] Predlozak predlozak)
         {
             ModelState.Remove("Id");
             ModelState.Remove("Pretplata");
             ModelState.Remove("Period");
+            ModelState.Remove("BrojRacuna");
 
             try
             {
                 if (ModelState.IsValid)
                 {
+                    var currentUser = await _userManager.GetUserAsync(User);
+                    if (currentUser == null)
+                    {
+                        return Unauthorized();
+                    }
+
                     predlozak.Id = Guid.NewGuid().ToString();
                     predlozak.Pretplata = false;
+                    predlozak.BrojRacuna = currentUser.Racun;
 
                     _context.Add(predlozak);
                     await _context.SaveChangesAsync();
@@ -151,7 +179,6 @@ namespace ETFPay.Controllers
             return View(predlozak);
         }
 
-        // GET: Predlozak/Details/5
         [Authorize(Roles = "Admin,Uposlenik")]
         public async Task<IActionResult> Details(string id)
         {
@@ -170,16 +197,12 @@ namespace ETFPay.Controllers
             return View(predlozak);
         }
 
-        // GET: Predlozak/Create
         [Authorize(Roles = "Admin,Uposlenik")]
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Predlozak/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin,Uposlenik")]
@@ -194,7 +217,6 @@ namespace ETFPay.Controllers
             return View(predlozak);
         }
 
-        // GET: Predlozak/Edit/5
         [Authorize(Roles = "Admin,Uposlenik")]
         public async Task<IActionResult> Edit(string id)
         {
@@ -211,9 +233,6 @@ namespace ETFPay.Controllers
             return View(predlozak);
         }
 
-        // POST: Predlozak/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin,Uposlenik")]
@@ -247,7 +266,6 @@ namespace ETFPay.Controllers
             return View(predlozak);
         }
 
-        // GET: Predlozak/Delete/5
         [Authorize(Roles = "Client")]
         public async Task<IActionResult> Delete(string id)
         {
@@ -266,7 +284,6 @@ namespace ETFPay.Controllers
             return View(predlozak);
         }
 
-        // POST: Predlozak/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Client")]
@@ -289,6 +306,47 @@ namespace ETFPay.Controllers
             }
 
             return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Client")]
+        public async Task<IActionResult> SaveTemplate([FromBody] Predlozak predlozak)
+        {
+            if (predlozak == null)
+            {
+                return BadRequest(new { message = "Podaci nisu ispravno poslani." });
+            }
+
+            ModelState.Remove("Id");
+            ModelState.Remove("Pretplata");
+            ModelState.Remove("Period");
+
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    var currentUser = await _userManager.GetUserAsync(User);
+                    if (currentUser == null)
+                    {
+                        return Unauthorized();
+                    }
+
+                    predlozak.Id = Guid.NewGuid().ToString();
+                    predlozak.Pretplata = false;
+                    predlozak.BrojRacuna = currentUser.Racun;
+
+                    _context.Add(predlozak);
+                    await _context.SaveChangesAsync();
+
+                    return Ok(new { message = "Predložak uspješno spasen u bazu!" });
+                }
+
+                return BadRequest(new { message = "Podaci nisu validni." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Greška prilikom spasavanja u bazu: " + ex.Message });
+            }
         }
 
         private bool PredlozakExists(string id)

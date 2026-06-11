@@ -45,7 +45,7 @@
                         @if (User.IsInRole("Uposlenik"))
                         {
                             <li class="nav-item">
-                                <a class="nav-link @(isZahtjevi ? "nav-link-active" : "text-dark")" asp-controller="Osoba" asp-action="ZahtjeviZaRacun">Zahtjevi za Račun</a>
+                                <a class="nav-link @(isZahtjevi ? "nav-link-active" : "text-dark")" asp-controller="Osoba" asp-action="ZahtjeviZaRacun">Account requests</a>
                             </li>
                         }
                     </ul>
@@ -70,11 +70,11 @@
                             <ul class="navbar-nav me-3 gap-2">
                                 <li class="nav-item">
                                     <a class="nav-link @(isPretplate ? "nav-link-active" : "text-dark")"
-                                       asp-controller="Predlozak" asp-action="PretplataView">PRETPLATE</a>
+                                       asp-controller="Predlozak" asp-action="PretplataView">Subscriptions</a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link @(isPredlosci ? "nav-link-active" : "text-dark")"
-                                       asp-controller="Predlozak" asp-action="PredlozakView">PREDLOSCI</a>
+                                       asp-controller="Predlozak" asp-action="PredlozakView">Templates</a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link @(isHistory ? "nav-link-active" : "text-dark")"
