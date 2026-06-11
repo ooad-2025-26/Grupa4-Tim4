@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ETFPay.Data;
@@ -13,10 +14,12 @@ namespace ETFPay.Controllers
     public class PredlozakController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<Osoba> _userManager;
 
-        public PredlozakController(ApplicationDbContext context)
+        public PredlozakController(ApplicationDbContext context, UserManager<Osoba> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Predlozak
@@ -30,8 +33,14 @@ namespace ETFPay.Controllers
         [Authorize(Roles = "Client")]
         public async Task<IActionResult> PretplataView(string id)
         {
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null)
+            {
+                return Unauthorized();
+            }
+
             var subscriptions = await _context.Predlozak
-                .Where(p => p.Pretplata == true)
+                .Where(p => p.Pretplata == true && p.BrojRacuna == currentUser.Racun)
                 .ToListAsync();
 
             if (!subscriptions.Any())
@@ -77,8 +86,15 @@ namespace ETFPay.Controllers
             {
                 if (ModelState.IsValid)
                 {
+                    var currentUser = await _userManager.GetUserAsync(User);
+                    if (currentUser == null)
+                    {
+                        return Unauthorized();
+                    }
+
                     predlozak.Id = Guid.NewGuid().ToString();
                     predlozak.Pretplata = true;
+                    predlozak.BrojRacuna = currentUser.Racun;
 
                     _context.Add(predlozak);
                     await _context.SaveChangesAsync();
@@ -97,8 +113,14 @@ namespace ETFPay.Controllers
         [Authorize(Roles = "Client")]
         public async Task<IActionResult> PredlozakView(string id)
         {
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null)
+            {
+                return Unauthorized();
+            }
+
             var templates = await _context.Predlozak
-                .Where(p => p.Pretplata == false)
+                .Where(p => p.Pretplata == false && p.BrojRacuna == currentUser.Racun)
                 .ToListAsync();
 
             if (!templates.Any())
@@ -139,8 +161,15 @@ namespace ETFPay.Controllers
             {
                 if (ModelState.IsValid)
                 {
+                    var currentUser = await _userManager.GetUserAsync(User);
+                    if (currentUser == null)
+                    {
+                        return Unauthorized();
+                    }
+
                     predlozak.Id = Guid.NewGuid().ToString();
                     predlozak.Pretplata = false;
+                    predlozak.BrojRacuna = currentUser.Racun;
 
                     _context.Add(predlozak);
                     await _context.SaveChangesAsync();
