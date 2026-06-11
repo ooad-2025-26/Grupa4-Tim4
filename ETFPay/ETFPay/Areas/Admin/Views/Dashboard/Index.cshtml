@@ -1,6 +1,6 @@
 @model ETFPay.Areas.Admin.Controllers.DashboardController.AdminDashboardViewModel
 @{
-    ViewData["Title"] = "Administracija";
+    ViewData["Title"] = "Administration";
 }
 
 <style>
@@ -195,11 +195,11 @@
 
 <div class="admin-page">
     <div class="admin-col">
-        <h2 class="admin-title">Uposlenici</h2>
+        <h2 class="admin-title">Employees</h2>
 
         <div class="admin-list-head">
-            <span>Uposlenik</span>
-            <span>Uloga</span>
+            <span>Employee</span>
+            <span>Role</span>
         </div>
 
         <div class="admin-list">
@@ -216,7 +216,7 @@
             }
             else
             {
-                <div class="text-muted py-3">Nema uposlenika za prikaz.</div>
+                <div class="text-muted py-3">No employees to display.</div>
             }
         </div>
 
@@ -224,66 +224,66 @@
         {
             <div class="left-actions">
                 <form asp-area="Admin" asp-controller="Dashboard" asp-action="ObrisiUposlenika" method="post"
-                      onsubmit="return confirm('Da li ste sigurni da želite obrisati uposlenika?');">
+                      onsubmit="return confirm('Are you sure you want to delete this employee?');">
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="id" value="@Model.Odabrani.Id" />
-                    <button type="submit" class="admin-btn">Obriši</button>
+                    <button type="submit" class="admin-btn">Delete</button>
                 </form>
             </div>
         }
     </div>
 
     <div class="admin-col">
-        @if (TempData["Uspjeh"] is string poruka)
+        @if (TempData["Success"] is string successMessage)
         {
-            <div class="alert alert-success admin-alert">@poruka</div>
+            <div class="alert alert-success admin-alert">@successMessage</div>
         }
-        @if (TempData["Greska"] is string greska)
+        @if (TempData["Error"] is string errorMessage)
         {
-            <div class="alert alert-danger admin-alert">@greska</div>
+            <div class="alert alert-danger admin-alert">@errorMessage</div>
         }
 
         @if (Model.PrikaziNoviForm)
         {
-            <h2 class="admin-title">Novi uposlenik</h2>
+            <h2 class="admin-title">New employee</h2>
 
             @if (Model.Uposlenici.Any())
             {
                 <a class="admin-btn-outline"
-                   href="@Url.Action("Index", "Dashboard", new { area = "Admin", id = Model.OdabraniId })">← Nazad na detalje</a>
+                   href="@Url.Action("Index", "Dashboard", new { area = "Admin", id = Model.OdabraniId })">← Back to details</a>
             }
 
             <form class="admin-form" asp-area="Admin" asp-controller="Dashboard" asp-action="KreirajUposlenika" method="post">
                 @Html.AntiForgeryToken()
                 <div asp-validation-summary="All" class="text-danger mb-2"></div>
 
-                <input asp-for="Novi.ImePrezime" class="form-control" placeholder="Ime i prezime" />
+                <input asp-for="Novi.ImePrezime" class="form-control" placeholder="Full name" />
                 <span asp-validation-for="Novi.ImePrezime" class="text-danger"></span>
 
                 <select asp-for="Novi.Uloga" class="form-select">
-                    <option value="Uposlenik">Operater</option>
-                    <option value="Zastitar">Zaštitar</option>
-                    <option value="Direktor">Direktor</option>
-                    <option value="Domar">Domar</option>
-                    <option value="Blagajnik">Blagajnik</option>
+                    <option value="Uposlenik">Employee</option>
+                    <option value="Zastitar">Security</option>
+                    <option value="Direktor">Director</option>
+                    <option value="Domar">Janitor</option>
+                    <option value="Blagajnik">Cashier</option>
                     <option value="Admin">Admin</option>
                 </select>
 
-                <input asp-for="Novi.Plata" type="number" step="0.01" min="0" class="form-control" placeholder="Plata" />
-                <input asp-for="Novi.BrojTelefona" class="form-control" placeholder="Broj telefona" />
+                <input asp-for="Novi.Plata" type="number" step="0.01" min="0" class="form-control" placeholder="Salary" />
+                <input asp-for="Novi.BrojTelefona" class="form-control" placeholder="Phone number" />
                 <input asp-for="Novi.Username" class="form-control" placeholder="Username" />
                 <span asp-validation-for="Novi.Username" class="text-danger"></span>
-                <input asp-for="Novi.Sifra" type="password" class="form-control" placeholder="Šifra" />
+                <input asp-for="Novi.Sifra" type="password" class="form-control" placeholder="Password" />
                 <span asp-validation-for="Novi.Sifra" class="text-danger"></span>
-                <small class="text-muted d-block mb-2">Šifra: min. 6 znakova, veliko i malo slovo, broj.</small>
+                <small class="text-muted d-block mb-2">Password: min. 6 characters, uppercase, lowercase, and a number.</small>
 
-                <button type="submit" class="admin-btn">Unesi</button>
+                <button type="submit" class="admin-btn">Create</button>
             </form>
         }
         else if (Model.PrikaziUrediForm && Model.Odabrani != null)
         {
             <a class="admin-btn-outline"
-               href="@Url.Action("Index", "Dashboard", new { area = "Admin", id = Model.Odabrani.Id })">← Nazad na detalje</a>
+               href="@Url.Action("Index", "Dashboard", new { area = "Admin", id = Model.Odabrani.Id })">← Back to details</a>
 
             <div class="detail-header">@Model.Odabrani.ImePrezime</div>
 
@@ -293,34 +293,34 @@
                 <div asp-validation-summary="All" class="text-danger mb-2"></div>
 
                 <div class="detail-row">
-                    <span class="detail-label">Uloga</span>
+                    <span class="detail-label">Role</span>
                     <select asp-for="Odabrani.Uloga" class="form-select mb-0">
-                        <option value="Uposlenik">Operater</option>
-                        <option value="Zastitar">Zaštitar</option>
-                        <option value="Direktor">Direktor</option>
-                        <option value="Domar">Domar</option>
-                        <option value="Blagajnik">Blagajnik</option>
+                        <option value="Uposlenik">Employee</option>
+                        <option value="Zastitar">Security</option>
+                        <option value="Direktor">Director</option>
+                        <option value="Domar">Janitor</option>
+                        <option value="Blagajnik">Cashier</option>
                         <option value="Admin">Admin</option>
                     </select>
                 </div>
 
                 <div class="detail-row">
-                    <span class="detail-label">Ime i prezime</span>
+                    <span class="detail-label">Full name</span>
                     <input asp-for="Odabrani.ImePrezime" class="form-control mb-0" />
                 </div>
 
                 <div class="detail-row">
-                    <span class="detail-label">Datum zaposlenja</span>
+                    <span class="detail-label">Hire date</span>
                     <input asp-for="Odabrani.DatumZaposlenja" type="date" class="form-control mb-0" />
                 </div>
 
                 <div class="detail-row">
-                    <span class="detail-label">Plata</span>
+                    <span class="detail-label">Salary</span>
                     <input asp-for="Odabrani.Plata" type="number" step="0.01" min="0" class="form-control mb-0" />
                 </div>
 
                 <div class="detail-row">
-                    <span class="detail-label">Broj telefona</span>
+                    <span class="detail-label">Phone number</span>
                     <input asp-for="Odabrani.BrojTelefona" class="form-control mb-0" />
                 </div>
 
@@ -330,51 +330,51 @@
                 </div>
 
                 <div class="detail-row">
-                    <span class="detail-label">Nova šifra</span>
+                    <span class="detail-label">New password</span>
                     <input asp-for="Odabrani.NovaSifra" type="password" class="form-control mb-0"
-                           placeholder="Ostavite prazno ako ne mijenjate" />
+                           placeholder="Leave blank to keep current password" />
                 </div>
 
                 <div class="detail-actions">
-                    <button type="submit" class="admin-btn">Sačuvaj izmjene</button>
+                    <button type="submit" class="admin-btn">Save changes</button>
                 </div>
             </form>
         }
         else if (Model.Odabrani != null)
         {
-            var ulogaTekst = Model.Odabrani.Uloga switch
+            var roleText = Model.Odabrani.Uloga switch
             {
-                "Uposlenik" => "Operater",
-                "Zastitar" => "Zaštitar",
-                "Direktor" => "Direktor",
-                "Domar" => "Domar",
-                "Blagajnik" => "Blagajnik",
+                "Uposlenik" => "Employee",
+                "Zastitar" => "Security",
+                "Direktor" => "Director",
+                "Domar" => "Janitor",
+                "Blagajnik" => "Cashier",
                 "Admin" => "Admin",
                 _ => Model.Odabrani.Uloga
             };
 
             <a class="admin-btn-outline"
-               href="@Url.Action("Index", "Dashboard", new { area = "Admin", mode = "novi" })">+ Novi uposlenik</a>
+               href="@Url.Action("Index", "Dashboard", new { area = "Admin", mode = "novi" })">+ New employee</a>
 
             <div class="detail-header">@Model.Odabrani.ImePrezime</div>
 
             <div class="detail-row">
-                <span class="detail-label">Uloga</span>
-                <div class="detail-value">@ulogaTekst</div>
+                <span class="detail-label">Role</span>
+                <div class="detail-value">@roleText</div>
             </div>
 
             <div class="detail-row">
-                <span class="detail-label">Datum zaposlenja</span>
-                <div class="detail-value">@(Model.Odabrani.DatumZaposlenja?.ToString("dd.MM.yyyy") ?? "—")</div>
+                <span class="detail-label">Hire date</span>
+                <div class="detail-value">@(Model.Odabrani.DatumZaposlenja?.ToString("MM/dd/yyyy") ?? "—")</div>
             </div>
 
             <div class="detail-row">
-                <span class="detail-label">Plata</span>
+                <span class="detail-label">Salary</span>
                 <div class="detail-value">@(Model.Odabrani.Plata?.ToString("N2") ?? "—")</div>
             </div>
 
             <div class="detail-row">
-                <span class="detail-label">Broj telefona</span>
+                <span class="detail-label">Phone number</span>
                 <div class="detail-value">@(string.IsNullOrWhiteSpace(Model.Odabrani.BrojTelefona) ? "—" : Model.Odabrani.BrojTelefona)</div>
             </div>
 
@@ -384,21 +384,21 @@
             </div>
 
             <div class="detail-row">
-                <span class="detail-label">Šifra</span>
+                <span class="detail-label">Password</span>
                 <div class="detail-value">••••••••</div>
             </div>
 
             <div class="detail-actions">
                 <a class="admin-btn"
-                   href="@Url.Action("Index", "Dashboard", new { area = "Admin", id = Model.Odabrani.Id, mode = "edit" })">Izmijeni</a>
+                   href="@Url.Action("Index", "Dashboard", new { area = "Admin", id = Model.Odabrani.Id, mode = "edit" })">Edit</a>
             </div>
         }
         else
         {
-            <h2 class="admin-title">Novi uposlenik</h2>
-            <p class="text-muted">Nema uposlenika. Dodajte prvog uposlenika.</p>
+            <h2 class="admin-title">New employee</h2>
+            <p class="text-muted">No employees yet. Add the first employee.</p>
             <a class="admin-btn-outline"
-               href="@Url.Action("Index", "Dashboard", new { area = "Admin", mode = "novi" })">+ Dodaj uposlenika</a>
+               href="@Url.Action("Index", "Dashboard", new { area = "Admin", mode = "novi" })">+ Add employee</a>
         }
     </div>
 </div>
