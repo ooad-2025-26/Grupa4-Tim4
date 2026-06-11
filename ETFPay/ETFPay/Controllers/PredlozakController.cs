@@ -67,10 +67,11 @@ namespace ETFPay.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Client")]
-        public async Task<IActionResult> DodavanjePretplate([Bind("Naziv,Primaoc,SvrhaUplate,Adresa,Grad,BrojRacuna,Iznos,Period")] Predlozak predlozak)
+        public async Task<IActionResult> DodavanjePretplate([Bind("Naziv,Primaoc,SvrhaUplate,Adresa,Grad,Iznos,Period")] Predlozak predlozak)
         {
             ModelState.Remove("Id");
             ModelState.Remove("Pretplata");
+            ModelState.Remove("BrojRacuna");
 
             if (string.IsNullOrEmpty(Request.Form["Period"]))
             {
@@ -144,11 +145,12 @@ namespace ETFPay.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Client")]
-        public async Task<IActionResult> DodavanjePredlozaka([Bind("Naziv,Primaoc,SvrhaUplate,Adresa,Grad,BrojRacuna,Iznos")] Predlozak predlozak)
+        public async Task<IActionResult> DodavanjePredlozaka([Bind("Naziv,Primaoc,SvrhaUplate,Adresa,Grad,Iznos")] Predlozak predlozak)
         {
             ModelState.Remove("Id");
             ModelState.Remove("Pretplata");
             ModelState.Remove("Period");
+            ModelState.Remove("BrojRacuna");
 
             try
             {
