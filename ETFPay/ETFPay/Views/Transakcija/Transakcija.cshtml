@@ -29,9 +29,9 @@
                         foreach (var template in Model)
                         {
                             <button class="list-group-item list-group-item-action template-item"
-                                    data-name="@template.Primaoc"
+                                    data-name="@template.Naziv"
                                     data-purpose="@template.SvrhaUplate"
-                                    data-account="@template.BrojRacuna"
+                                    data-account="@template.Primaoc"
                                     data-city="@template.Grad"
                                     data-address="@template.Adresa">
                                 @template.Naziv
@@ -170,12 +170,11 @@
             }
 
             const templateData = {
-                Primaoc: primaoc,
-                BrojRacuna: brojRacuna,
+                Primaoc: brojRacuna,
                 SvrhaUplate: svrha,
                 Grad: grad,
                 Adresa: adresa,
-                Naziv: "Template: " + primaoc
+                Naziv: primaoc
             };
 
             resultDiv.innerText = "Saving template...";
@@ -200,8 +199,16 @@
                     resultDiv.innerText = "Template successfully saved! Refresh the page to see it in the list.";
                     resultDiv.style.color = "green";
                 } else {
-                    const errorText = await response.text();
-                    resultDiv.innerText = "Error saving template: " + errorText;
+                    let errorMessage = "Unable to save template.";
+                    try {
+                        const errorData = await response.json();
+                        if (errorData?.message) {
+                            errorMessage = errorData.message;
+                        }
+                    } catch {
+                        errorMessage = await response.text();
+                    }
+                    resultDiv.innerText = errorMessage;
                     resultDiv.style.color = "red";
                 }
             } catch (error) {
