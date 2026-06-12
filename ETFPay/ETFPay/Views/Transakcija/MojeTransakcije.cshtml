@@ -87,7 +87,7 @@
                            class="rate-row text-decoration-none @(odabrana?.Id == t.Id ? "active" : "")">
                             <span class="code"></span>
                             <span class="name">@imeProtivnika</span>
-                            <span class="value @(plus ? "iznos-ulaz" : "iznos-izlaz")">@(plus ? "+" : "-")@t.Iznos.ToString("N2") KM</span>
+                            <span class="value @(plus ? "iznos-ulaz" : "iznos-izlaz")">@(plus ? "+" : "-")@t.Iznos.ToString("N2") BAM</span>
                         </a>
                     }
                 </div>
@@ -110,7 +110,7 @@
                         </div>
                         <div class="d-flex justify-content-between py-2 border-bottom">
                             <span>Amount</span>
-                            <span class="fw-semibold @(plus ? "iznos-ulaz" : "iznos-izlaz")">@(plus ? "+" : "-")@odabrana.Iznos.ToString("N2") KM</span>
+                            <span class="fw-semibold @(plus ? "iznos-ulaz" : "iznos-izlaz")">@(plus ? "+" : "-")@odabrana.Iznos.ToString("N2") BAM</span>
                         </div>
                         <div class="d-flex justify-content-between py-2 border-bottom">
                             <span>Payment purpose</span>

@@ -37,8 +37,14 @@ namespace ETFPay.Controllers
                 return Unauthorized();
             }
 
+            var brojRacunaKorisnika = await _context.Racun
+                .Where(r => r.Id == currentUser.Racun)
+                .Select(r => r.brojRacuna)
+                .FirstOrDefaultAsync();
+
             var subscriptions = await _context.Predlozak
-                .Where(p => p.Pretplata == true && p.BrojRacuna == currentUser.Racun)
+                .Where(p => p.Pretplata == true &&
+                    (p.BrojRacuna == currentUser.Racun || p.BrojRacuna == brojRacunaKorisnika))
                 .ToListAsync();
 
             if (!subscriptions.Any())
@@ -89,6 +95,17 @@ namespace ETFPay.Controllers
                         return Unauthorized();
                     }
 
+                    var mojBrojRacuna = await _context.Racun
+                        .Where(r => r.Id == currentUser.Racun)
+                        .Select(r => r.brojRacuna)
+                        .FirstOrDefaultAsync();
+
+                    if (JeVlastitiRacun(predlozak.Primaoc, currentUser.Racun, mojBrojRacuna))
+                    {
+                        ModelState.AddModelError("Primaoc", "You cannot create a subscription to your own account.");
+                        return View(predlozak);
+                    }
+
                     predlozak.Id = Guid.NewGuid().ToString();
                     predlozak.Pretplata = true;
                     predlozak.BrojRacuna = currentUser.Racun;
@@ -115,8 +132,14 @@ namespace ETFPay.Controllers
                 return Unauthorized();
             }
 
+            var brojRacunaKorisnika = await _context.Racun
+                .Where(r => r.Id == currentUser.Racun)
+                .Select(r => r.brojRacuna)
+                .FirstOrDefaultAsync();
+
             var templates = await _context.Predlozak
-                .Where(p => p.Pretplata == false && p.BrojRacuna == currentUser.Racun)
+                .Where(p => p.Pretplata == false &&
+                    (p.BrojRacuna == currentUser.Racun || p.BrojRacuna == brojRacunaKorisnika))
                 .ToListAsync();
 
             if (!templates.Any())
@@ -160,6 +183,17 @@ namespace ETFPay.Controllers
                     if (currentUser == null)
                     {
                         return Unauthorized();
+                    }
+
+                    var mojBrojRacuna = await _context.Racun
+                        .Where(r => r.Id == currentUser.Racun)
+                        .Select(r => r.brojRacuna)
+                        .FirstOrDefaultAsync();
+
+                    if (JeVlastitiRacun(predlozak.Primaoc, currentUser.Racun, mojBrojRacuna))
+                    {
+                        ModelState.AddModelError("Primaoc", "You cannot create a template to your own account.");
+                        return View(predlozak);
                     }
 
                     predlozak.Id = Guid.NewGuid().ToString();
@@ -343,6 +377,16 @@ namespace ETFPay.Controllers
                         return Unauthorized();
                     }
 
+                    var mojBrojRacuna = await _context.Racun
+                        .Where(r => r.Id == currentUser.Racun)
+                        .Select(r => r.brojRacuna)
+                        .FirstOrDefaultAsync();
+
+                    if (JeVlastitiRacun(predlozak.Primaoc, currentUser.Racun, mojBrojRacuna))
+                    {
+                        return BadRequest(new { message = "You cannot create a template to your own account." });
+                    }
+
                     predlozak.Id = Guid.NewGuid().ToString();
                     predlozak.Pretplata = false;
                     predlozak.BrojRacuna = currentUser.Racun;
@@ -368,6 +412,15 @@ namespace ETFPay.Controllers
             {
                 return StatusCode(500, new { message = "Greška prilikom spasavanja u bazu: " + ex.Message });
             }
+        }
+
+        private static bool JeVlastitiRacun(string? primaoc, string? racunId, string? brojRacuna)
+        {
+            if (string.IsNullOrWhiteSpace(primaoc))
+                return false;
+
+            return (!string.IsNullOrEmpty(racunId) && primaoc == racunId)
+                || (!string.IsNullOrEmpty(brojRacuna) && primaoc == brojRacuna);
         }
 
         private bool PredlozakExists(string id)

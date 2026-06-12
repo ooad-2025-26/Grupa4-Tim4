@@ -140,7 +140,7 @@
 
                 <div class="mb-4">
                     <small class="text-white-50 d-block text-uppercase small" style="font-size: 0.75rem;">Account balance</small>
-                    <span class="fs-2 fw-bold">@racun.Stanje.ToString("N2") KM</span>
+                    <span class="fs-2 fw-bold">@racun.Stanje.ToString("N2") BAM</span>
                 </div>
 
                 <div class="d-flex justify-content-between align-items-end mt-2">
@@ -172,7 +172,7 @@
                                     <div class="transakcija-datum">@t.VrijemeTransakcije.ToString("dd.MM.yyyy HH:mm")</div>
                                 </div>
                                 <span class="transakcija-iznos @(jeUlazna ? "iznos-ulaz" : "iznos-izlaz")">
-                                    @(jeUlazna ? "+" : "-")@t.Iznos.ToString("N2") KM
+                                    @(jeUlazna ? "+" : "-")@t.Iznos.ToString("N2") BAM
                                 </span>
                             </div>
                         }

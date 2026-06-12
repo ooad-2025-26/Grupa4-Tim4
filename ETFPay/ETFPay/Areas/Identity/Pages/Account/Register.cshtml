@@ -4,7 +4,7 @@
     ViewData["Title"] = "Register";
 }
 
-<div class="container mt-5">
+<div class="container mt-5" style="padding-bottom: calc(var(--wave-height) + 2rem);">
     <div class="row justify-content-center text-center">
         <div class="col-md-4">
             <h1>@ViewData["Title"]</h1>
@@ -37,7 +37,7 @@
                     </div>
 
                     <div class="form-floating mb-3">
-                        <input asp-for="Input.JMBG" class="form-control" autocomplete="off" aria-required="true" placeholder="Enter JMBG" />
+                        <input asp-for="Input.JMBG" class="form-control" autocomplete="off" aria-required="true" placeholder="Enter JMBG" maxlength="13" inputmode="numeric" pattern="(0[1-9]|[12][0-9]|3[01])(0[1-9]|1[012])[0-9]{9}" title="JMBG must be exactly 13 digits" />
                         <label asp-for="Input.JMBG">JMBG</label>
                         <span asp-validation-for="Input.JMBG" class="text-danger"></span>
                     </div>
@@ -53,7 +53,7 @@
                     </div>
 
                     <div class="form-floating mb-3">
-                        <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                        <input asp-for="Input.Email" class="form-control" type="email" autocomplete="username" aria-required="true" placeholder="name@example.com" title="Enter a valid email address (e.g. name@example.com)" />
                         <label asp-for="Input.Email">Email</label>
                         <span asp-validation-for="Input.Email" class="text-danger"></span>
                     </div>
@@ -79,4 +79,49 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function () {
+            const jmbgInput = document.getElementById('Input_JMBG');
+            const dateInput = document.getElementById('Input_DatumRodjenja');
+            const mismatchMsg = 'Date of birth does not match the JMBG data.';
+            let mismatchSpan;
+
+            function getMismatchSpan() {
+                if (!mismatchSpan && dateInput) {
+                    mismatchSpan = document.createElement('span');
+                    mismatchSpan.className = 'text-danger';
+                    mismatchSpan.id = 'jmbg-date-mismatch';
+                    dateInput.closest('.form-floating')?.appendChild(mismatchSpan);
+                }
+                return mismatchSpan;
+            }
+
+            function validateJmbgDate() {
+                const span = getMismatchSpan();
+                if (!jmbgInput || !dateInput || !span) return true;
+
+                const jmbg = jmbgInput.value.trim();
+                const date = dateInput.value;
+                if (jmbg.length !== 13 || !date) {
+                    span.textContent = '';
+                    return true;
+                }
+
+                const d = new Date(date + 'T00:00:00');
+                const matches =
+                    jmbg.substring(0, 2) === String(d.getDate()).padStart(2, '0') &&
+                    jmbg.substring(2, 4) === String(d.getMonth() + 1).padStart(2, '0') &&
+                    jmbg.substring(4, 7) === String(d.getFullYear()).substring(1);
+
+                span.textContent = matches ? '' : mismatchMsg;
+                return matches;
+            }
+
+            jmbgInput?.addEventListener('input', validateJmbgDate);
+            dateInput?.addEventListener('change', validateJmbgDate);
+            document.getElementById('registerForm')?.addEventListener('submit', function (e) {
+                if (!validateJmbgDate()) e.preventDefault();
+            });
+        })();
+    </script>
 }
