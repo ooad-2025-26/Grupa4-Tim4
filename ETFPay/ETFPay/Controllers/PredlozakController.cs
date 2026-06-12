@@ -389,18 +389,9 @@ namespace ETFPay.Controllers
                         return Unauthorized();
                     }
 
-                    var userWithAccount = await _context.Users
-                        .Include(u => u.RacunKorisnika)
-                        .FirstOrDefaultAsync(u => u.Id == currentUser.Id);
-
-                    if (userWithAccount?.RacunKorisnika == null)
-                    {
-                        return BadRequest(new { message = "User account information is missing." });
-                    }
-
                     predlozak.Id = Guid.NewGuid().ToString();
                     predlozak.Pretplata = false;
-                    predlozak.BrojRacuna = userWithAccount.RacunKorisnika.brojRacuna;
+                    predlozak.BrojRacuna = currentUser.Racun;
 
                     _context.Add(predlozak);
                     await _context.SaveChangesAsync();
