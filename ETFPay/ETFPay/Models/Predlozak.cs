@@ -9,11 +9,13 @@ namespace ETFPay.Models
 
         [Key]
         public String Id { get; set; }
+        [NoNumbers]
         public String Naziv { get; set; }
         [PrimaocExists]
         public String Primaoc { get; set; }
         public String SvrhaUplate { get; set; }
         public String Adresa { get; set; }
+        [NoNumbers]
         public String Grad { get; set; }
         public String BrojRacuna { get; set; }
         public Double Iznos { get; set; }

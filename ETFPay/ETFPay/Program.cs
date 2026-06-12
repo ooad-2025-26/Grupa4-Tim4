@@ -128,18 +128,22 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-var blockedEmailConfirmationPaths = new[]
+var blockedIdentityPaths = new[]
 {
     "/identity/account/confirmemail",
     "/identity/account/confirmemailchange",
     "/identity/account/resendemailconfirmation",
-    "/identity/account/registerconfirmation"
+    "/identity/account/registerconfirmation",
+    "/identity/account/forgotpassword",
+    "/identity/account/forgotpasswordconfirmation",
+    "/identity/account/resetpassword",
+    "/identity/account/resetpasswordconfirmation"
 };
 
 app.Use(async (context, next) =>
 {
     var path = context.Request.Path.Value?.ToLowerInvariant() ?? "";
-    if (blockedEmailConfirmationPaths.Any(p => path.StartsWith(p, StringComparison.Ordinal)))
+    if (blockedIdentityPaths.Any(p => path.StartsWith(p, StringComparison.Ordinal)))
     {
         context.Response.StatusCode = StatusCodes.Status404NotFound;
         return;
