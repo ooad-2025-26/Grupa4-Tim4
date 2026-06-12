@@ -189,12 +189,28 @@ namespace ETFPay.Controllers
                 .Where(t => t.Primaoc == user.Racun || t.Posiljaoc == user.Racun)
                 .OrderByDescending(t => t.VrijemeTransakcije)
                 .ToListAsync();
+
+            var odabrana = !string.IsNullOrEmpty(id)
+                ? transakcije.FirstOrDefault(t => t.Id == id)
+                : transakcije.FirstOrDefault();
+
+            var brojRacunaDrugaStrana = "";
+            if (odabrana != null)
+            {
+                var drugiRacunId = odabrana.Primaoc == user.Racun ? odabrana.Posiljaoc : odabrana.Primaoc;
+                brojRacunaDrugaStrana = await _context.Racun
+                    .Where(r => r.Id == drugiRacunId)
+                    .Select(r => r.brojRacuna)
+                    .FirstOrDefaultAsync() ?? "";
+            }
+
             return View(new TransakcijeViewModel
             {
                 Transakcije = transakcije,
-                Odabrana = !string.IsNullOrEmpty(id) ? transakcije.FirstOrDefault(t => t.Id == id) : transakcije.FirstOrDefault(),
+                Odabrana = odabrana,
                 BrojRacunaKorisnika = brojRacuna,
-                RacunIdKorisnika = user.Racun
+                RacunIdKorisnika = user.Racun,
+                BrojRacunaDrugaStrana = brojRacunaDrugaStrana
             });
         }
 

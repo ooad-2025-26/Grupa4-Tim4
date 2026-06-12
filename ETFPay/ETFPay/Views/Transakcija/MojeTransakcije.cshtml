@@ -63,7 +63,7 @@
 
 <div class="hero">
     <div class="container">
-        <h1>HISTORIJA TRANSAKCIJA</h1>
+        <h1>TRANSACTION HISTORY</h1>
         <div class="divider"></div>
 
         <div class="row history-layout justify-content-center">
@@ -71,13 +71,13 @@
                 <div class="rates mx-auto history-rates">
                     <div class="rate-row fw-bold" style="pointer-events:none">
                         <span class="code"></span>
-                        <span class="name">Transakcije</span>
-                        <span class="value">Iznos</span>
+                        <span class="name">Transactions</span>
+                        <span class="value">Amount</span>
                     </div>
 
                     @if (!Model.Transakcije.Any())
                     {
-                        <p class="text-muted mt-3">Nemate transakcija.</p>
+                        <p class="text-muted mt-3">You have no transactions.</p>
                     }
 
                     @foreach (var t in Model.Transakcije)
@@ -87,7 +87,7 @@
                         <a asp-action="MojeTransakcije" asp-route-id="@t.Id"
                            class="rate-row text-decoration-none @(odabrana?.Id == t.Id ? "active" : "")">
                             <span class="code"></span>
-                            <span class="name">Transakcija @i</span>
+                            <span class="name">Transaction @i</span>
                             <span class="value @(plus ? "iznos-ulaz" : "iznos-izlaz")">@(plus ? "+" : "-")@t.Iznos.ToString("N2") KM</span>
                         </a>
                     }
@@ -102,23 +102,23 @@
                     <div class="conversion mx-auto history-detail">
                         <div class="rate-row active mb-3" style="pointer-events:none">
                             <span class="code"></span>
-                            <span class="name">TRANSAKCIJA @idx</span>
+                            <span class="name">TRANSACTION @idx</span>
                             <span class="value"></span>
                         </div>
                         <div class="d-flex justify-content-between py-2 border-bottom">
-                            <span>Broj računa</span>
-                            <span class="fw-semibold">@Model.BrojRacunaKorisnika</span>
+                            <span>Account number</span>
+                            <span class="fw-semibold">@(string.IsNullOrEmpty(Model.BrojRacunaDrugaStrana) ? "—" : Model.BrojRacunaDrugaStrana)</span>
                         </div>
                         <div class="d-flex justify-content-between py-2 border-bottom">
-                            <span>Iznos</span>
+                            <span>Amount</span>
                             <span class="fw-semibold @(plus ? "iznos-ulaz" : "iznos-izlaz")">@(plus ? "+" : "-")@odabrana.Iznos.ToString("N2") KM</span>
                         </div>
                         <div class="d-flex justify-content-between py-2 border-bottom">
-                            <span>Svrha uplate</span>
+                            <span>Payment purpose</span>
                             <span class="fw-semibold">@(string.IsNullOrEmpty(odabrana.SvrhaUplate) ? "-" : odabrana.SvrhaUplate)</span>
                         </div>
                         <div class="d-flex justify-content-between py-2">
-                            <span>Datum transakcije</span>
+                            <span>Transaction date</span>
                             <span class="fw-semibold">@odabrana.VrijemeTransakcije.ToString("dd/MM/yyyy")</span>
                         </div>
                     </div>
@@ -126,7 +126,7 @@
                 else
                 {
                     <div class="conversion mx-auto">
-                        <p class="text-muted mb-0">Odaberite transakciju.</p>
+                        <p class="text-muted mb-0">Select a transaction.</p>
                     </div>
                 }
             </div>
