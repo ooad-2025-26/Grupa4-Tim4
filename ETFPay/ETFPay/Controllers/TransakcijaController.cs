@@ -194,6 +194,24 @@ namespace ETFPay.Controllers
                 ? transakcije.FirstOrDefault(t => t.Id == id)
                 : transakcije.FirstOrDefault();
 
+            var drugiRacunIds = transakcije
+                .Select(t => t.Primaoc == user.Racun ? t.Posiljaoc : t.Primaoc)
+                .Distinct()
+                .ToList();
+
+            var osobePoRacunu = await _context.Users
+                .Where(o => o.Racun != null && drugiRacunIds.Contains(o.Racun))
+                .Select(o => new { o.Racun, PunoIme = o.Ime + " " + o.Prezime })
+                .ToDictionaryAsync(o => o.Racun!, o => o.PunoIme);
+
+            var imenaProtivnika = transakcije.ToDictionary(
+                t => t.Id,
+                t =>
+                {
+                    var drugiRacunId = t.Primaoc == user.Racun ? t.Posiljaoc : t.Primaoc;
+                    return osobePoRacunu.TryGetValue(drugiRacunId, out var ime) ? ime : "—";
+                });
+
             var brojRacunaDrugaStrana = "";
             if (odabrana != null)
             {
@@ -210,7 +228,8 @@ namespace ETFPay.Controllers
                 Odabrana = odabrana,
                 BrojRacunaKorisnika = brojRacuna,
                 RacunIdKorisnika = user.Racun,
-                BrojRacunaDrugaStrana = brojRacunaDrugaStrana
+                BrojRacunaDrugaStrana = brojRacunaDrugaStrana,
+                ImeProtivnikaPoTransakciji = imenaProtivnika
             });
         }
 

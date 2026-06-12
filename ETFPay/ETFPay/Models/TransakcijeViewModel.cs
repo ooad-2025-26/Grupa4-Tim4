@@ -7,6 +7,6 @@
         public string BrojRacunaKorisnika { get; set; } = "";
         public string RacunIdKorisnika { get; set; } = "";
         public string BrojRacunaDrugaStrana { get; set; } = "";
-
+        public Dictionary<string, string> ImeProtivnikaPoTransakciji { get; set; } = new();
     }
 }
