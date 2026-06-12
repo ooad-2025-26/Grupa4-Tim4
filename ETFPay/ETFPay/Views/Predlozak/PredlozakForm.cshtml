@@ -13,24 +13,8 @@
 
         <div class="row justify-content-center">
             <div class="col-lg-10">
-                @if (!ViewData.ModelState.IsValid)
-                {
-                    <div class="alert alert-danger">
-                        <h4>Validation errors:</h4>
-                        <ul>
-                            @foreach (var modelState in ViewData.ModelState.Values)
-                            {
-                                @foreach (var error in modelState.Errors)
-                                {
-                                    <li>@error.ErrorMessage</li>
-                                }
-                            }
-                        </ul>
-                    </div>
-                }
-
                 <form asp-action="@formAction" method="post">
-                    <div asp-validation-summary="All" class="text-danger"></div>
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
                     <div class="row">
                         <!-- Left Column -->

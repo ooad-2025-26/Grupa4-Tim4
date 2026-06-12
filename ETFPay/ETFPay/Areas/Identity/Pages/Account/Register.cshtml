@@ -6,71 +6,95 @@
 
 <div class="container mt-5" style="padding-bottom: calc(var(--wave-height) + 2rem);">
     <div class="row justify-content-center text-center">
-        <div class="col-md-4">
+        <div class="col-md-8">
             <h1>@ViewData["Title"]</h1>
         </div>
     </div>
 
     <div class="row justify-content-center">
-        <div class="col-md-4">
+        <div class="col-md-8">
             <section>
                 <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="bg-white p-4 rounded shadow-sm">
-                    
+
                     <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
 
-                    <div class="form-floating mb-3">
-                        <input asp-for="Input.Ime" class="form-control" autocomplete="given-name" aria-required="true" placeholder="Enter first name" />
-                        <label asp-for="Input.Ime">First Name</label>
-                        <span asp-validation-for="Input.Ime" class="text-danger"></span>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Input.Ime" class="form-control" autocomplete="given-name" aria-required="true" placeholder="Enter first name" />
+                                <label asp-for="Input.Ime">First Name</label>
+                                <span asp-validation-for="Input.Ime" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Input.Prezime" class="form-control" autocomplete="family-name" aria-required="true" placeholder="Enter last name" />
+                                <label asp-for="Input.Prezime">Last Name</label>
+                                <span asp-validation-for="Input.Prezime" class="text-danger"></span>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="form-floating mb-3">
-                        <input asp-for="Input.Prezime" class="form-control" autocomplete="family-name" aria-required="true" placeholder="Enter last name" />
-                        <label asp-for="Input.Prezime">Last Name</label>
-                        <span asp-validation-for="Input.Prezime" class="text-danger"></span>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Input.PhoneNumber" class="form-control" autocomplete="tel" aria-required="true" placeholder="Enter phone number" />
+                                <label asp-for="Input.PhoneNumber">Phone Number</label>
+                                <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Input.JMBG" class="form-control" autocomplete="off" aria-required="true" placeholder="Enter JMBG" maxlength="13" inputmode="numeric" pattern="(0[1-9]|[12][0-9]|3[01])(0[1-9]|1[012])[0-9]{9}" title="JMBG must be exactly 13 digits" />
+                                <label asp-for="Input.JMBG">JMBG</label>
+                                <span asp-validation-for="Input.JMBG" class="text-danger"></span>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="form-floating mb-3">
-                        <input asp-for="Input.PhoneNumber" class="form-control" autocomplete="tel" aria-required="true" placeholder="Enter phone number" />
-                        <label asp-for="Input.PhoneNumber">Phone Number</label>
-                        <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Input.DatumRodjenja"
+                                       class="form-control"
+                                       type="date"
+                                       max="@DateTime.Today.AddYears(-16).ToString("yyyy-MM-dd")"
+                                       aria-required="true" />
+                                <label asp-for="Input.DatumRodjenja">Date of Birth</label>
+                                <span asp-validation-for="Input.DatumRodjenja" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Input.Email" class="form-control" type="email" autocomplete="username" aria-required="true" placeholder="name@example.com" title="Enter a valid email address (e.g. name@example.com)" />
+                                <label asp-for="Input.Email">Email</label>
+                                <span asp-validation-for="Input.Email" class="text-danger"></span>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="form-floating mb-3">
-                        <input asp-for="Input.JMBG" class="form-control" autocomplete="off" aria-required="true" placeholder="Enter JMBG" maxlength="13" inputmode="numeric" pattern="(0[1-9]|[12][0-9]|3[01])(0[1-9]|1[012])[0-9]{9}" title="JMBG must be exactly 13 digits" />
-                        <label asp-for="Input.JMBG">JMBG</label>
-                        <span asp-validation-for="Input.JMBG" class="text-danger"></span>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
+                                <label asp-for="Input.Password">Password</label>
+                                <span asp-validation-for="Input.Password" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
+                                <label asp-for="Input.ConfirmPassword">Confirm Password</label>
+                                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="form-floating mb-3">
-                        <input asp-for="Input.DatumRodjenja"
-                               class="form-control"
-                               type="date"
-                               max="@DateTime.Today.AddYears(-16).ToString("yyyy-MM-dd")"
-                               aria-required="true" />
-                        <label asp-for="Input.DatumRodjenja">Date of Birth</label>
-                        <span asp-validation-for="Input.DatumRodjenja" class="text-danger"></span>
+                    <div class="row mt-2">
+                        <div class="col-12">
+                            <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
+                        </div>
                     </div>
-
-                    <div class="form-floating mb-3">
-                        <input asp-for="Input.Email" class="form-control" type="email" autocomplete="username" aria-required="true" placeholder="name@example.com" title="Enter a valid email address (e.g. name@example.com)" />
-                        <label asp-for="Input.Email">Email</label>
-                        <span asp-validation-for="Input.Email" class="text-danger"></span>
-                    </div>
-                    
-                    <div class="form-floating mb-3">
-                        <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                        <label asp-for="Input.Password">Password</label>
-                        <span asp-validation-for="Input.Password" class="text-danger"></span>
-                    </div>
-                    
-                    <div class="form-floating mb-3">
-                        <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                        <label asp-for="Input.ConfirmPassword">Confirm Password</label>
-                        <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
-                    </div>
-
-                    <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
                 </form>
             </section>
         </div>

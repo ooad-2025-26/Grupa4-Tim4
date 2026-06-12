@@ -1,5 +1,408 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+@model ETFPay.Controllers.OsobaController.AdminDashboardViewModel
 @{
+    ViewData["Title"] = "Administration";
+}
+
+<style>
+    .admin-page {
+        display: flex;
+        gap: 48px;
+        padding: 24px 8px 48px;
+        align-items: flex-start;
+        position: relative;
+        z-index: 2;
+    }
+
+    @@media (max-width: 768px) {
+        .admin-page {
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .detail-row {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .detail-label {
+            min-width: 0;
+        }
+    }
+
+    .admin-col {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .admin-title {
+        font-size: 1.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        margin-bottom: 1.25rem;
+        color: #111;
+    }
+
+    .admin-list-head {
+        display: flex;
+        justify-content: space-between;
+        font-weight: 600;
+        color: #666;
+        margin-bottom: 0.75rem;
+        padding: 0 0.25rem;
+    }
+
+    .admin-list {
+        max-height: 420px;
+        overflow-y: auto;
+        padding-right: 4px;
+        flex: 1;
+    }
+
+    .admin-list-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #ececec;
+        border-radius: 10px;
+        padding: 14px 16px;
+        margin-bottom: 10px;
+        text-decoration: none;
+        color: #333;
+        transition: background 0.2s ease;
+        cursor: pointer;
+        position: relative;
+        z-index: 1;
+    }
+
+    .admin-list-item:hover {
+        background: #e2e2e2;
+        color: #333;
+    }
+
+    .admin-list-item.active {
+        background: #1f6b60;
+        color: #fff;
+    }
+
+    .admin-list-item.active span:last-child {
+        color: #e8f5f2;
+    }
+
+    .admin-form .form-control,
+    .admin-form .form-select {
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        padding: 12px 14px;
+        margin-bottom: 12px;
+        font-size: 0.95rem;
+        width: 100%;
+    }
+
+    .admin-form .form-control::placeholder {
+        color: #999;
+    }
+
+    .admin-btn {
+        background: #1f6b60;
+        color: #fff;
+        border: 3px solid #fff;
+        border-radius: 10px;
+        padding: 14px 48px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-top: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    }
+
+    .admin-btn:hover {
+        background: #164d43;
+        color: #fff;
+        border-color: #fff;
+    }
+
+    a.admin-btn {
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .admin-btn-outline {
+        background: transparent;
+        color: #1f6b60;
+        border: 2px solid #1f6b60;
+        border-radius: 10px;
+        padding: 8px 16px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        margin-bottom: 1rem;
+        cursor: pointer;
+        position: relative;
+        z-index: 1;
+    }
+
+    .admin-alert {
+        border-radius: 10px;
+        margin-bottom: 1rem;
+    }
+
+    .detail-header {
+        background: #1f6b60;
+        color: #fff;
+        border-radius: 10px;
+        padding: 16px 20px;
+        font-weight: 800;
+        text-transform: uppercase;
+        margin-bottom: 1.25rem;
+        font-size: 1.1rem;
+    }
+
+    .detail-row {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 12px;
+    }
+
+    .detail-label {
+        min-width: 140px;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .detail-actions {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 1rem;
+    }
+
+    .detail-value {
+        flex: 1;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        padding: 12px 14px;
+        background: #f5f5f5;
+        color: #333;
+        font-size: 0.95rem;
+    }
+
+    .left-actions {
+        margin-top: 1rem;
+    }
+</style>
+
+<div class="admin-page">
+    <div class="admin-col">
+        <h2 class="admin-title">Employees</h2>
+
+        <div class="admin-list-head">
+            <span>Employee</span>
+            <span>Role</span>
+        </div>
+
+        <div class="admin-list">
+            @if (Model.Uposlenici.Any())
+            {
+                @foreach (var u in Model.Uposlenici)
+                {
+                    <a class="admin-list-item @(u.Id == Model.OdabraniId ? "active" : "")"
+                       href="@Url.Action("Index", "Osoba", new { id = u.Id })">
+                        <span>@u.PunoIme</span>
+                        <span>@u.Uloga</span>
+                    </a>
+                }
+            }
+            else
+            {
+                <div class="text-muted py-3">No employees to display.</div>
+            }
+        </div>
+
+        @if (Model.Odabrani != null && !Model.PrikaziNoviForm)
+        {
+            <div class="left-actions">
+                <form asp-controller="Osoba" asp-action="ObrisiUposlenika" method="post"
+                      onsubmit="return confirm('Are you sure you want to delete this employee?');">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@Model.Odabrani.Id" />
+                    <button type="submit" class="admin-btn">Delete</button>
+                </form>
+            </div>
+        }
+    </div>
+
+    <div class="admin-col">
+        @if (TempData["Success"] is string successMessage)
+        {
+            <div class="alert alert-success admin-alert">@successMessage</div>
+        }
+        @if (TempData["Error"] is string errorMessage)
+        {
+            <div class="alert alert-danger admin-alert">@errorMessage</div>
+        }
+
+        @if (Model.PrikaziNoviForm)
+        {
+            <h2 class="admin-title">New employee</h2>
+
+            @if (Model.Uposlenici.Any())
+            {
+                <a class="admin-btn-outline"
+                   href="@Url.Action("Index", "Osoba", new { id = Model.OdabraniId })">← Back to details</a>
+            }
+
+            <form class="admin-form" asp-controller="Osoba" asp-action="KreirajUposlenika" method="post">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="All" class="text-danger mb-2"></div>
+
+                <input asp-for="Novi.ImePrezime" class="form-control" placeholder="Full name" />
+                <span asp-validation-for="Novi.ImePrezime" class="text-danger"></span>
+
+                <select asp-for="Novi.Uloga" class="form-select">
+                    <option value="Uposlenik">Employee</option>
+                    <option value="Zastitar">Security</option>
+                    <option value="Direktor">Director</option>
+                    <option value="Domar">Janitor</option>
+                    <option value="Blagajnik">Cashier</option>
+                    <option value="Admin">Admin</option>
+                </select>
+
+                <input asp-for="Novi.Plata" type="number" step="0.01" min="0" class="form-control" placeholder="Salary" />
+                <input asp-for="Novi.BrojTelefona" class="form-control" placeholder="Phone number" pattern="0[0-9]{8,9}" inputmode="numeric" title="Phone must start with 0 and contain 9 or 10 digits" />
+                <input asp-for="Novi.Username" class="form-control" placeholder="Username" />
+                <span asp-validation-for="Novi.Username" class="text-danger"></span>
+                <input asp-for="Novi.Sifra" type="password" class="form-control" placeholder="Password" />
+                <span asp-validation-for="Novi.Sifra" class="text-danger"></span>
+                <small class="text-muted d-block mb-2">Password: min. 6 characters, uppercase, lowercase, and a number.</small>
+
+                <button type="submit" class="admin-btn">Create</button>
+            </form>
+        }
+        else if (Model.PrikaziUrediForm && Model.Odabrani != null)
+        {
+            <a class="admin-btn-outline"
+               href="@Url.Action("Index", "Osoba", new { id = Model.Odabrani.Id })">← Back to details</a>
+
+            <div class="detail-header">@Model.Odabrani.ImePrezime</div>
+
+            <form class="admin-form" asp-controller="Osoba" asp-action="UrediUposlenika" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="Odabrani.Id" />
+                <div asp-validation-summary="All" class="text-danger mb-2"></div>
+
+                <div class="detail-row">
+                    <span class="detail-label">Role</span>
+                    <select asp-for="Odabrani.Uloga" class="form-select mb-0">
+                        <option value="Uposlenik">Employee</option>
+                        <option value="Zastitar">Security</option>
+                        <option value="Direktor">Director</option>
+                        <option value="Domar">Janitor</option>
+                        <option value="Blagajnik">Cashier</option>
+                        <option value="Admin">Admin</option>
+                    </select>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">Full name</span>
+                    <input asp-for="Odabrani.ImePrezime" class="form-control mb-0" />
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">Hire date</span>
+                    <input asp-for="Odabrani.DatumZaposlenja" type="date" class="form-control mb-0" />
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">Salary</span>
+                    <input asp-for="Odabrani.Plata" type="number" step="0.01" min="0" class="form-control mb-0" />
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">Phone number</span>
+                    <input asp-for="Odabrani.BrojTelefona" class="form-control mb-0" pattern="0[0-9]{8,9}" inputmode="numeric" title="Phone must start with 0 and contain 9 or 10 digits" />
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">Username</span>
+                    <input asp-for="Odabrani.Username" class="form-control mb-0" />
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">New password</span>
+                    <input asp-for="Odabrani.NovaSifra" type="password" class="form-control mb-0"
+                           placeholder="Leave blank to keep current password" />
+                </div>
+
+                <div class="detail-actions">
+                    <button type="submit" class="admin-btn">Save changes</button>
+                </div>
+            </form>
+        }
+        else if (Model.Odabrani != null)
+        {
+            var roleText = Model.Odabrani.Uloga switch
+            {
+                "Uposlenik" => "Employee",
+                "Zastitar" => "Security",
+                "Direktor" => "Director",
+                "Domar" => "Janitor",
+                "Blagajnik" => "Cashier",
+                "Admin" => "Admin",
+                _ => Model.Odabrani.Uloga
+            };
+
+            <a class="admin-btn-outline"
+               href="@Url.Action("Index", "Osoba", new { mode = "novi" })">+ New employee</a>
+
+            <div class="detail-header">@Model.Odabrani.ImePrezime</div>
+
+            <div class="detail-row">
+                <span class="detail-label">Role</span>
+                <div class="detail-value">@roleText</div>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-label">Hire date</span>
+                <div class="detail-value">@(Model.Odabrani.DatumZaposlenja?.ToString("MM/dd/yyyy") ?? "—")</div>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-label">Salary</span>
+                <div class="detail-value">@(Model.Odabrani.Plata?.ToString("N2") ?? "—")</div>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-label">Phone number</span>
+                <div class="detail-value">@(string.IsNullOrWhiteSpace(Model.Odabrani.BrojTelefona) ? "—" : Model.Odabrani.BrojTelefona)</div>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-label">Username</span>
+                <div class="detail-value">@Model.Odabrani.Username</div>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-label">Password</span>
+                <div class="detail-value">••••••••</div>
+            </div>
+
+            <div class="detail-actions">
+                <a class="admin-btn"
+                   href="@Url.Action("Index", "Osoba", new { id = Model.Odabrani.Id, mode = "edit" })">Edit</a>
+            </div>
+        }
+        else
+        {
+            <h2 class="admin-title">New employee</h2>
+            <p class="text-muted">No employees yet. Add the first employee.</p>
+            <a class="admin-btn-outline"
+               href="@Url.Action("Index", "Osoba", new { mode = "novi" })">+ Add employee</a>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
 }

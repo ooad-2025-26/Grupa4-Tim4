@@ -1,0 +1,17 @@
+@model ETFPay.Models.Predlozak
+
+@{
+    ViewData["Title"] = "Add Template";
+    ViewData["FormAction"] = "DodavanjePredlozaka";
+    ViewData["PageTitle"] = "ADD TEMPLATE";
+    ViewData["SubmitButtonText"] = "ADD TEMPLATE";
+    ViewData["ShowPeriod"] = false;
+}
+
+@await Html.PartialAsync("PredlozakForm", Model)
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -169,7 +169,7 @@
                             <div class="transakcija-oblacic">
                                 <div>
                                     <div class="transakcija-tip">@(string.IsNullOrWhiteSpace(t.SvrhaUplate) ? "—" : t.SvrhaUplate)</div>
-                                    <div class="transakcija-datum">@t.VrijemeTransakcije.ToString("dd.MM.yyyy HH:mm")</div>
+                                    <div class="transakcija-datum">@t.VrijemeTransakcije.ULokalnoVrijeme().ToString("dd.MM.yyyy HH:mm")</div>
                                 </div>
                                 <span class="transakcija-iznos @(jeUlazna ? "iznos-ulaz" : "iznos-izlaz")">
                                     @(jeUlazna ? "+" : "-")@t.Iznos.ToString("N2") BAM

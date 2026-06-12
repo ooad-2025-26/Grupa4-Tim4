@@ -93,14 +93,14 @@ namespace ETFPay.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index(string? id, string? mode)
         {
-            return View(await BuildViewModelAsync(id, mode, new NoviUposlenikForm(), null));
+            return View("UposleniciView", await BuildViewModelAsync(id, mode, new NoviUposlenikForm(), null));
         }
 
         [HttpGet]
         [Authorize(Roles = "Admin,Uposlenik")]
         public async Task<IActionResult> UserSearch(string? q, string? filter, string? sort, string? sortDir, string? id)
         {
-            return View(await BuildUserSearchViewModelAsync(q, filter, sort, sortDir, id));
+            return View("KlijentView", await BuildUserSearchViewModelAsync(q, filter, sort, sortDir, id));
         }
 
         [HttpPost]
@@ -120,13 +120,13 @@ namespace ETFPay.Controllers
                 ModelState.AddModelError("Novi.BrojTelefona", "Phone number must start with 0 and contain 9 or 10 digits.");
 
             if (!ModelState.IsValid)
-                return View("Index", await BuildViewModelAsync(null, "novi", novi, null));
+                return View("UposleniciView", await BuildViewModelAsync(null, "novi", novi, null));
 
             var username = novi.Username.Trim();
             if (await _userManager.FindByNameAsync(username) != null)
             {
                 ModelState.AddModelError("Novi.Username", "Username is already taken.");
-                return View("Index", await BuildViewModelAsync(null, "novi", novi, null));
+                return View("UposleniciView", await BuildViewModelAsync(null, "novi", novi, null));
             }
 
             var user = new Osoba
@@ -148,7 +148,7 @@ namespace ETFPay.Controllers
             {
                 foreach (var error in result.Errors)
                     ModelState.AddModelError(string.Empty, error.Description);
-                return View("Index", await BuildViewModelAsync(null, "novi", novi, null));
+                return View("UposleniciView", await BuildViewModelAsync(null, "novi", novi, null));
             }
 
             if (!await _roleManager.RoleExistsAsync(uloga))
@@ -160,7 +160,7 @@ namespace ETFPay.Controllers
                 await _userManager.DeleteAsync(user);
                 foreach (var error in roleResult.Errors)
                     ModelState.AddModelError(string.Empty, error.Description);
-                return View("Index", await BuildViewModelAsync(null, "novi", novi, null));
+                return View("UposleniciView", await BuildViewModelAsync(null, "novi", novi, null));
             }
 
             TempData["Success"] = "Employee added successfully.";
@@ -193,7 +193,7 @@ namespace ETFPay.Controllers
                 ModelState.AddModelError("Odabrani.BrojTelefona", "Phone number must start with 0 and contain 9 or 10 digits.");
 
             if (!ModelState.IsValid)
-                return View("Index", await BuildViewModelAsync(odabrani.Id, "edit", new NoviUposlenikForm(), odabrani));
+                return View("UposleniciView", await BuildViewModelAsync(odabrani.Id, "edit", new NoviUposlenikForm(), odabrani));
 
             user.Ime = dijelovi[0];
             user.Prezime = dijelovi[1];
@@ -209,7 +209,7 @@ namespace ETFPay.Controllers
             {
                 foreach (var error in updateResult.Errors)
                     ModelState.AddModelError(string.Empty, error.Description);
-                return View("Index", await BuildViewModelAsync(odabrani.Id, "edit", new NoviUposlenikForm(), odabrani));
+                return View("UposleniciView", await BuildViewModelAsync(odabrani.Id, "edit", new NoviUposlenikForm(), odabrani));
             }
 
             if (!string.IsNullOrWhiteSpace(odabrani.NovaSifra))
@@ -220,7 +220,7 @@ namespace ETFPay.Controllers
                 {
                     foreach (var error in passResult.Errors)
                         ModelState.AddModelError(string.Empty, error.Description);
-                    return View("Index", await BuildViewModelAsync(odabrani.Id, "edit", new NoviUposlenikForm(), odabrani));
+                    return View("UposleniciView", await BuildViewModelAsync(odabrani.Id, "edit", new NoviUposlenikForm(), odabrani));
                 }
             }
 

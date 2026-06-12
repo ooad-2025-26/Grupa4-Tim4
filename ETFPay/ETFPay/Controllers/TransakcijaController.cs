@@ -34,7 +34,7 @@ namespace ETFPay.Controllers
 
             if (user?.RacunKorisnika == null)
             {
-                return View(new List<Predlozak>());
+                return View("PlacanjeView", new List<Predlozak>());
             }
 
             var brojRacuna = user.RacunKorisnika.brojRacuna;
@@ -44,7 +44,7 @@ namespace ETFPay.Controllers
                     (p.BrojRacuna == brojRacuna || p.BrojRacuna == user.Racun))
                 .ToListAsync();
 
-            return View(predlosciIzBaze);
+            return View("PlacanjeView", predlosciIzBaze);
         }
 
         [Authorize(Roles = "Admin,Uposlenik")]
@@ -226,7 +226,7 @@ namespace ETFPay.Controllers
                     .FirstOrDefaultAsync() ?? "";
             }
 
-            return View(new TransakcijeViewModel
+            return View("HistorijaTransakcijaView", new TransakcijeViewModel
             {
                 Transakcije = transakcije,
                 Odabrana = odabrana,

@@ -65,7 +65,7 @@ namespace ETFPay.Controllers
         [Authorize(Roles = "Client")]
         public IActionResult DodavanjePretplate()
         {
-            return View();
+            return View("DodavanjePretplataView");
         }
 
         [HttpPost]
@@ -99,7 +99,7 @@ namespace ETFPay.Controllers
                 if (JeVlastitiRacun(predlozak.Primaoc, userWithAccount.Racun, userWithAccount.RacunKorisnika.brojRacuna))
                 {
                     ModelState.AddModelError("Primaoc", "You cannot create a subscription to your own account.");
-                    return View(predlozak);
+                    return View("DodavanjePretplataView", predlozak);
                 }
 
                 if (ModelState.IsValid)
@@ -118,7 +118,7 @@ namespace ETFPay.Controllers
                 ModelState.AddModelError("", "An error occurred while saving: " + ex.Message);
             }
 
-            return View(predlozak);
+            return View("DodavanjePretplataView", predlozak);
         }
 
         [Authorize(Roles = "Client")]
@@ -158,7 +158,7 @@ namespace ETFPay.Controllers
         [Authorize(Roles = "Client")]
         public IActionResult DodavanjePredlozaka()
         {
-            return View();
+            return View("DodajPredlozakView");
         }
 
         [HttpPost]
@@ -187,7 +187,7 @@ namespace ETFPay.Controllers
                 if (JeVlastitiRacun(predlozak.Primaoc, userWithAccount.Racun, userWithAccount.RacunKorisnika.brojRacuna))
                 {
                     ModelState.AddModelError("Primaoc", "You cannot create a template to your own account.");
-                    return View(predlozak);
+                    return View("DodajPredlozakView", predlozak);
                 }
 
                 if (ModelState.IsValid)
@@ -206,7 +206,7 @@ namespace ETFPay.Controllers
                 ModelState.AddModelError("", "An error occurred while saving: " + ex.Message);
             }
 
-            return View(predlozak);
+            return View("DodajPredlozakView", predlozak);
         }
 
         [Authorize(Roles = "Admin,Uposlenik")]
