@@ -37,7 +37,7 @@ namespace ETFPay.Controllers
 
         
             var predlosciIzBaze = await _context.Predlozak
-                .Where(p => p.Pretplata == false && p.Id == userId) //
+                .Where(p => p.Pretplata == false && p.BrojRacuna == user.Racun)
                 .ToListAsync();
 
             return View(predlosciIzBaze);

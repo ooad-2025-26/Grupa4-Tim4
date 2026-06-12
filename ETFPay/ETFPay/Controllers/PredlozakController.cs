@@ -320,6 +320,18 @@ namespace ETFPay.Controllers
             ModelState.Remove("Id");
             ModelState.Remove("Pretplata");
             ModelState.Remove("Period");
+            ModelState.Remove("BrojRacuna");
+            ModelState.Remove("Iznos");
+            ModelState.Remove("PosljednjePlacanje");
+
+            if (string.IsNullOrWhiteSpace(predlozak.Grad))
+            {
+                ModelState.Remove("Grad");
+                predlozak.Grad = "";
+            }
+
+            if (string.IsNullOrWhiteSpace(predlozak.Adresa))
+                predlozak.Adresa = "";
 
             try
             {
@@ -341,7 +353,16 @@ namespace ETFPay.Controllers
                     return Ok(new { message = "Predložak uspješno spasen u bazu!" });
                 }
 
-                return BadRequest(new { message = "Podaci nisu validni." });
+                var errors = ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage)
+                    .Where(m => !string.IsNullOrWhiteSpace(m))
+                    .ToList();
+
+                return BadRequest(new
+                {
+                    message = errors.FirstOrDefault() ?? "Podaci nisu validni."
+                });
             }
             catch (Exception ex)
             {
