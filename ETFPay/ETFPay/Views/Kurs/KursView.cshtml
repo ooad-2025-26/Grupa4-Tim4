@@ -38,17 +38,17 @@
     <div class="container">
         <div class="zrequests">
             <div class="z-left">
-                <div class="z-title">Aktuelni kursevi</div>
+                <div class="z-title">Latest rates</div>
                 <div class="list-header">
-                    <div>Kratica/Naziv</div>
-                    <div>Iznos</div>
+                    <div>Abbreviation/Name</div>
+                    <div>Rate</div>
                 </div>
 
                 <div class="kursevi" id="listaValuta">
                     <div class="kurs-item baza">
                         <div class="kurs-info">
                             <span class="kurs-code">BAM</span>
-                            <span id="bazni-kurs-name">Bosanskohercegovačka marka</span>
+                            <span id="bazni-kurs-name">Bosnian mark</span>
                         </div>
                         <div class="kurs-value">1</div>
                     </div>
@@ -73,40 +73,48 @@
             </div>
 
             <div class="z-right">
-                <div class="z-title">Konverzija valuta</div>
+                <div class="z-title">Currency conversion</div>
                 
-                <form method="get" asp-action="Index">
+                <form method="get" action="/Currencies">
+                    
+                    @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ContainsKey("KonverzijaGreska"))
+                    {
+                        <div class="alert alert-danger p-2 small mb-3" role="alert">
+                            @ViewData.ModelState["KonverzijaGreska"].Errors.FirstOrDefault()?.ErrorMessage
+                        </div>
+                    }
+
                     <div class="konverzije-kontejner">
                         <div class="kurs-input-group">
-                            <input type="text" name="iz" class="code-input" value="@ViewBag.Iz" />
-                            <input type="number" name="iznos" value="@ViewBag.Iznos" step="any" required />
+                            <input type="text" name="iz" class="code-input" value="@ViewBag.Iz" required placeholder="From" />
+                            <input type="number" name="iznos" value="@ViewBag.Iznos" step="any" min="0.00001" required />
                         </div>
 
                         <div class="jednako">=</div>
 
                         <div class="kurs-input-group">
-                            <input type="text" name="u" class="code-input" value="@ViewBag.U" />
+                            <input type="text" name="u" class="code-input" value="@ViewBag.U" required placeholder="To" />
                             <input type="text" class="readonly-input" readonly value="@ViewBag.Rezultat" placeholder="" />
                         </div>
                     </div>
                     
-                    <button type="submit" class="btn-submit">KONVERTUJ</button>
+                    <button type="submit" class="btn-submit">CONVERT</button>
                 </form>
 
                 <div class="z-title" style="font-size: 28px;">Pretraga</div>
 
-                    <form method="get" asp-action="Index">
+                    <form method="get" action="/Currencies">
                         <input type="hidden" name="iz" value="@ViewBag.Iz" />
                         <input type="hidden" name="u" value="@ViewBag.U" />
                         <input type="hidden" name="iznos" value="@ViewBag.Iznos" />
 
                         <div style="margin-bottom: 15px;">
-                            <input type="text" name="pretraga" class="search-input" placeholder="Unesite valutu..." value="@ViewBag.Pretraga" />
+                            <input type="text" name="pretraga" class="search-input" placeholder="Enter a currency..." value="@ViewBag.Pretraga" />
                         </div>
                     </form>
                     <div class="list-header">
-                        <div>Kratica/Naziv</div>
-                        <div>Iznos</div>
+                        <div>Abbreviation/Name</div>
+                        <div>Rate</div>
                     </div>
                     <div class="list-header" style="padding: 0 10px; margin-top: 15px;">
                         @if (ViewBag.RezultatPretrage is ETFPay.Models.Kurs res)
@@ -124,9 +132,14 @@
                     @if (!string.IsNullOrEmpty(ViewBag.Pretraga) && ViewBag.RezultatPretrage == null)
                     {
                         <div style="padding: 5px 10px; color: #cc0000; font-size: 14px;">
-                            Valuta nije pronađena.
+                            Currency not found.
                         </div>
                     }
             </div>
         </div>
-    </div></div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

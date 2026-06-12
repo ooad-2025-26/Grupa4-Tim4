@@ -11,11 +11,6 @@ namespace ETFPay.Controllers
     {
         private readonly KursService _kursService;
 
-        private readonly string[] AktuelneValute = {
-            "EUR", "AUD", "CAD", "CZK", "DKK", "HUF", "JPY", "NOK",
-            "SEK", "CHF", "TRY", "GBP", "USD", "RUB", "CNY", "RSD"
-        };
-
         public KursController(KursService kursService)
         {
             _kursService = kursService;
@@ -52,11 +47,52 @@ namespace ETFPay.Controllers
                 k => DajPuniNazivValute(k.CiljanaValuta)
             );
 
-            if (iznos.HasValue && iznos > 0)
-            {
-                double rezultat = await _kursService.KonvertujIznos(iz, u, (double)iznos);
+            bool jeValidno = true;
 
-                ViewBag.Rezultat = Math.Floor(rezultat * 10000) / 10000;
+            if (HttpContext.Request.Query.ContainsKey("iz") || HttpContext.Request.Query.ContainsKey("u") || HttpContext.Request.Query.ContainsKey("iznos"))
+            {
+                if (string.IsNullOrWhiteSpace(iz) || string.IsNullOrWhiteSpace(u))
+                {
+                    ModelState.AddModelError("KonverzijaGreska", "Both currency fields are required.");
+                    jeValidno = false;
+                }
+                else
+                {
+                    string izUpper = iz.Trim().ToUpper();
+                    string uUpper = u.Trim().ToUpper();
+
+                    var sviDostupniKodovi = kursnaLista.Select(k => k.CiljanaValuta.ToUpper()).ToList();
+                    sviDostupniKodovi.Add("BAM");
+
+                    if (!sviDostupniKodovi.Contains(izUpper) || !sviDostupniKodovi.Contains(uUpper))
+                    {
+                        ModelState.AddModelError("KonverzijaGreska", "One or both entered currencies are invalid or not supported.");
+                        jeValidno = false;
+                    }
+                }
+
+                if (!iznos.HasValue || iznos <= 0)
+                {
+                    ModelState.AddModelError("KonverzijaGreska", "The amount must be a valid number greater than 0.");
+                    jeValidno = false;
+                }
+            }
+
+            if (jeValidno && iznos.HasValue && iznos > 0 && !string.IsNullOrEmpty(iz) && !string.IsNullOrEmpty(u))
+            {
+                string izUpper = iz.Trim().ToUpper();
+                string uUpper = u.Trim().ToUpper();
+
+                if (izUpper == uUpper)
+                {
+                    ViewBag.Rezultat = iznos.Value;
+                }
+                else
+                {
+                    double rezultat = await _kursService.KonvertujIznos(iz, u, (double)iznos);
+                    ViewBag.Rezultat = Math.Floor(rezultat * 10000) / 10000;
+                }
+
                 ViewBag.Iznos = iznos;
                 ViewBag.Iz = iz;
                 ViewBag.U = u;
@@ -64,9 +100,9 @@ namespace ETFPay.Controllers
             else
             {
                 ViewBag.Rezultat = "";
-                ViewBag.Iznos = 1;
-                ViewBag.Iz = "BAM";
-                ViewBag.U = "EUR";
+                ViewBag.Iznos = iznos ?? 1;
+                ViewBag.Iz = string.IsNullOrEmpty(iz) ? "BAM" : iz;
+                ViewBag.U = string.IsNullOrEmpty(u) ? "EUR" : u;
             }
 
             var filtriranaListaZaView = kursnaLista
@@ -81,21 +117,21 @@ namespace ETFPay.Controllers
             return kodValute.ToUpper() switch
             {
                 "EUR" => "Euro",
-                "AUD" => "Australijski dolar",
-                "CAD" => "Kanadski dolar",
-                "CZK" => "Češka kruna",
-                "DKK" => "Danska kruna",
-                "HUF" => "Mađarska forinta",
-                "JPY" => "Japanski jen",
-                "NOK" => "Norveška kruna",
-                "SEK" => "Švedska kruna",
-                "CHF" => "Švicarski franak",
-                "TRY" => "Turska lira",
-                "GBP" => "Britanska funta",
-                "USD" => "Američki dolar",
-                "RUB" => "Ruska rublja",
-                "CNY" => "Kineski juan",
-                "RSD" => "Srpski dinar",
+                "AUD" => "Australian dollar",
+                "CAD" => "Canadian dollar",
+                "CZK" => "Czech koruna",
+                "DKK" => "Danish krone",
+                "HUF" => "Hungarian forint",
+                "JPY" => "Japanese yen",
+                "NOK" => "Norwegian krone",
+                "SEK" => "Swedish krona",
+                "CHF" => "Swiss franc",
+                "TRY" => "Turkish lira",
+                "GBP" => "British pound",
+                "USD" => "United States dollar",
+                "RUB" => "Russian ruble",
+                "CNY" => "Chinese yuan",
+                "RSD" => "Serbian dinar",
                 _ => ""
             };
         }
