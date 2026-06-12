@@ -6,6 +6,7 @@ using ETFPay.Services;
 namespace ETFPay.Controllers
 {
     [Authorize(Roles = "Admin,Uposlenik,Client")]
+    [Route("Currencies")]
     public class KursController : Controller
     {
         private readonly KursService _kursService;
@@ -20,7 +21,8 @@ namespace ETFPay.Controllers
             _kursService = kursService;
         }
 
-        public async Task<IActionResult> Index(string? iz, string? u, double? iznos, string? pretraga)
+        [HttpGet("")]
+        public async Task<IActionResult> KursView(string? iz, string? u, double? iznos, string? pretraga)
         {
             var kursnaLista = await _kursService.DobaviKursnuListu("BAM");
 
@@ -71,7 +73,7 @@ namespace ETFPay.Controllers
                 .Where(k => aktuelneValute.Contains(k.CiljanaValuta.ToUpper()))
                 .ToList();
 
-            return View(filtriranaListaZaView);
+            return View("KursView", filtriranaListaZaView);
         }
 
         private static string DajPuniNazivValute(string kodValute)
