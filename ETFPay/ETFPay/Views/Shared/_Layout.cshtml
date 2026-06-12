@@ -11,15 +11,14 @@
     var isHistory = currentController == "Transakcija" && currentAction == "MojeTransakcije";
     var isCurrencies = currentController == "Kurs";
     var isPayment = currentController == "Transakcija" && currentAction == "Transakcija";
-}
-<!DOCTYPE html>
+}<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - ETFPay</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link class="nav-link" rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/ETFPay.styles.css" asp-append-version="true" />
 </head>
 <body>
@@ -42,18 +41,19 @@
                         <li class="nav-item">
                             <a class="nav-link @(isHome ? "nav-link-active" : "text-dark")" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                        @if (User.IsInRole("Uposlenik"))
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link @(isZahtjevi ? "nav-link-active" : "text-dark")" asp-controller="Osoba" asp-action="ZahtjeviZaRacun">Account requests</a>
-                            </li>
-                        }
+                        @* Ovdje je bio Account requests, sada je premješten desno *@
                     </ul>
 
                     <div class="d-flex align-items-center">
                         @if (User.IsInRole("Admin") || User.IsInRole("Uposlenik"))
                         {
                             <ul class="navbar-nav me-3 gap-2">
+                                @if (User.IsInRole("Uposlenik"))
+                                {
+                                    <li class="nav-item">
+                                        <a class="nav-link @(isZahtjevi ? "nav-link-active" : "text-dark")" asp-controller="Osoba" asp-action="ZahtjeviZaRacun">Account requests</a>
+                                    </li>
+                                }
                                 @if (User.IsInRole("Admin"))
                                 {
                                     <li class="nav-item">
@@ -110,5 +110,6 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)</body>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
 </html>
