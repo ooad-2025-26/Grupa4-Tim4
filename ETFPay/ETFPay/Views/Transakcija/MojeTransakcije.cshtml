@@ -2,7 +2,6 @@
 @{
     ViewData["Title"] = "History";
     var odabrana = Model.Odabrana;
-    var i = 0;
 }
 
 <style>
@@ -82,12 +81,12 @@
 
                     @foreach (var t in Model.Transakcije)
                     {
-                        i++;
                         var plus = t.Primaoc == Model.RacunIdKorisnika;
+                        var imeProtivnika = Model.ImeProtivnikaPoTransakciji.GetValueOrDefault(t.Id, "—");
                         <a asp-action="MojeTransakcije" asp-route-id="@t.Id"
                            class="rate-row text-decoration-none @(odabrana?.Id == t.Id ? "active" : "")">
                             <span class="code"></span>
-                            <span class="name">Transaction @i</span>
+                            <span class="name">@imeProtivnika</span>
                             <span class="value @(plus ? "iznos-ulaz" : "iznos-izlaz")">@(plus ? "+" : "-")@t.Iznos.ToString("N2") KM</span>
                         </a>
                     }
@@ -97,12 +96,12 @@
             <div class="col-lg-5">
                 @if (odabrana != null)
                 {
-                    var idx = Model.Transakcije.FindIndex(t => t.Id == odabrana.Id) + 1;
                     var plus = odabrana.Primaoc == Model.RacunIdKorisnika;
+                    var imeOdabrane = Model.ImeProtivnikaPoTransakciji.GetValueOrDefault(odabrana.Id, "—");
                     <div class="conversion mx-auto history-detail">
                         <div class="rate-row active mb-3" style="pointer-events:none">
                             <span class="code"></span>
-                            <span class="name">TRANSACTION @idx</span>
+                            <span class="name">@imeOdabrane.ToUpper()</span>
                             <span class="value"></span>
                         </div>
                         <div class="d-flex justify-content-between py-2 border-bottom">
