@@ -38,10 +38,12 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link @(isHome ? "nav-link-active" : "text-dark")" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        @* Ovdje je bio Account requests, sada je premješten desno *@
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link @(isHome ? "nav-link-active" : "text-dark")" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            </li>
+                        }
                     </ul>
 
                     <div class="d-flex align-items-center">
