@@ -50,10 +50,13 @@
                                 <span asp-validation-for="Adresa" class="text-danger"></span>
                             </div>
 
-                            <div class="mb-4">
-                                <input asp-for="Iznos" class="form-control" placeholder="Amount:" style="border-radius: 8px; border: 1px solid #ccc; padding: 12px; font-size: 14px; color: #999;" />
-                                <span asp-validation-for="Iznos" class="text-danger"></span>
-                            </div>
+                            @if (showPeriodSection)
+                            {
+                                <div class="mb-4">
+                                    <input asp-for="Iznos" class="form-control" placeholder="Amount:" style="border-radius: 8px; border: 1px solid #ccc; padding: 12px; font-size: 14px; color: #999;" />
+                                    <span asp-validation-for="Iznos" class="text-danger"></span>
+                                </div>
+                            }
                         </div>
 
                         <!-- Right Column -->

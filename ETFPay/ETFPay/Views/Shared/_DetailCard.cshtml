@@ -17,12 +17,15 @@
 
         <hr>
 
-        <div class="mb-3" style="display: flex; justify-content: space-between;">
-            <strong>Amount</strong>
-            <div style="font-size: 18px;">@Model.Iznos.ToString("F2") BAM</div>
-        </div>
+        @if (Model.Pretplata)
+        {
+            <div class="mb-3" style="display: flex; justify-content: space-between;">
+                <strong>Amount</strong>
+                <div style="font-size: 18px;">@Model.Iznos.ToString("F2") BAM</div>
+            </div>
 
-        <hr>
+            <hr>
+        }
 
         <div class="mb-3" style="display: flex; justify-content: space-between;">
             <strong>Payment purpose</strong>

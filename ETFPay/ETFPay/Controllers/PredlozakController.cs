@@ -37,8 +37,17 @@ namespace ETFPay.Controllers
                 return Unauthorized();
             }
 
+            var userWithAccount = await _context.Users
+                .Include(u => u.RacunKorisnika)
+                .FirstOrDefaultAsync(u => u.Id == currentUser.Id);
+
+            if (userWithAccount?.RacunKorisnika == null)
+            {
+                return BadRequest("User account information is missing.");
+            }
+
             var subscriptions = await _context.Predlozak
-                .Where(p => p.Pretplata == true && p.BrojRacuna == currentUser.Racun)
+                .Where(p => p.Pretplata == true && p.BrojRacuna == userWithAccount.RacunKorisnika.brojRacuna)
                 .ToListAsync();
 
             if (!subscriptions.Any())
@@ -81,17 +90,31 @@ namespace ETFPay.Controllers
 
             try
             {
+                var currentUser = await _userManager.GetUserAsync(User);
+                if (currentUser == null)
+                {
+                    return Unauthorized();
+                }
+
+                var userWithAccount = await _context.Users
+                    .Include(u => u.RacunKorisnika)
+                    .FirstOrDefaultAsync(u => u.Id == currentUser.Id);
+
+                if (userWithAccount?.RacunKorisnika == null)
+                {
+                    return BadRequest("User account information is missing.");
+                }
+
+                if (predlozak.Primaoc == userWithAccount.RacunKorisnika.brojRacuna)
+                {
+                    ModelState.AddModelError("Primaoc", "You cannot create a subscription to pay to yourself.");
+                }
+
                 if (ModelState.IsValid)
                 {
-                    var currentUser = await _userManager.GetUserAsync(User);
-                    if (currentUser == null)
-                    {
-                        return Unauthorized();
-                    }
-
                     predlozak.Id = Guid.NewGuid().ToString();
                     predlozak.Pretplata = true;
-                    predlozak.BrojRacuna = currentUser.Racun;
+                    predlozak.BrojRacuna = userWithAccount.RacunKorisnika.brojRacuna;
 
                     _context.Add(predlozak);
                     await _context.SaveChangesAsync();
@@ -115,8 +138,17 @@ namespace ETFPay.Controllers
                 return Unauthorized();
             }
 
+            var userWithAccount = await _context.Users
+                .Include(u => u.RacunKorisnika)
+                .FirstOrDefaultAsync(u => u.Id == currentUser.Id);
+
+            if (userWithAccount?.RacunKorisnika == null)
+            {
+                return BadRequest("User account information is missing.");
+            }
+
             var templates = await _context.Predlozak
-                .Where(p => p.Pretplata == false && p.BrojRacuna == currentUser.Racun)
+                .Where(p => p.Pretplata == false && p.BrojRacuna == userWithAccount.RacunKorisnika.brojRacuna)
                 .ToListAsync();
 
             if (!templates.Any())
@@ -154,17 +186,31 @@ namespace ETFPay.Controllers
 
             try
             {
+                var currentUser = await _userManager.GetUserAsync(User);
+                if (currentUser == null)
+                {
+                    return Unauthorized();
+                }
+
+                var userWithAccount = await _context.Users
+                    .Include(u => u.RacunKorisnika)
+                    .FirstOrDefaultAsync(u => u.Id == currentUser.Id);
+
+                if (userWithAccount?.RacunKorisnika == null)
+                {
+                    return BadRequest("User account information is missing.");
+                }
+
+                if (predlozak.Primaoc == userWithAccount.RacunKorisnika.brojRacuna)
+                {
+                    ModelState.AddModelError("Primaoc", "You cannot create a template to pay to yourself.");
+                }
+
                 if (ModelState.IsValid)
                 {
-                    var currentUser = await _userManager.GetUserAsync(User);
-                    if (currentUser == null)
-                    {
-                        return Unauthorized();
-                    }
-
                     predlozak.Id = Guid.NewGuid().ToString();
                     predlozak.Pretplata = false;
-                    predlozak.BrojRacuna = currentUser.Racun;
+                    predlozak.BrojRacuna = userWithAccount.RacunKorisnika.brojRacuna;
 
                     _context.Add(predlozak);
                     await _context.SaveChangesAsync();
@@ -343,9 +389,18 @@ namespace ETFPay.Controllers
                         return Unauthorized();
                     }
 
+                    var userWithAccount = await _context.Users
+                        .Include(u => u.RacunKorisnika)
+                        .FirstOrDefaultAsync(u => u.Id == currentUser.Id);
+
+                    if (userWithAccount?.RacunKorisnika == null)
+                    {
+                        return BadRequest(new { message = "User account information is missing." });
+                    }
+
                     predlozak.Id = Guid.NewGuid().ToString();
                     predlozak.Pretplata = false;
-                    predlozak.BrojRacuna = currentUser.Racun;
+                    predlozak.BrojRacuna = userWithAccount.RacunKorisnika.brojRacuna;
 
                     _context.Add(predlozak);
                     await _context.SaveChangesAsync();
