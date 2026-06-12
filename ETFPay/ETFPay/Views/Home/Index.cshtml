@@ -5,6 +5,13 @@
 <div class="hero">
     <div class="text-center">
         <h1 class="display-4">Welcome to ETFPay!</h1>
-         <h2 class="display-6">Register or login to get started</h2>
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <h2 class="display-6">Welcome!</h2>
+        }
+        else
+        {
+            <h2 class="display-6">Register or login to get started</h2>
+        }
     </div>
 </div>

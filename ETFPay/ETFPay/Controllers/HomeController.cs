@@ -35,13 +35,20 @@ namespace ETFPay.Controllers
 
                 if (User.IsInRole("Uposlenik"))
                 {
-                    return RedirectToAction("ZahtjeviZaRacun", "Osoba");
+                    return RedirectToAction("UposlenikIndex", "Home");
                 }
             }
             return View();
         }
+
         [Authorize(Roles = "Admin")]
         public IActionResult AdminIndex()
+        {
+            return View();
+        }
+
+        [Authorize(Roles = "Uposlenik")]
+        public IActionResult UposlenikIndex()
         {
             return View();
         }

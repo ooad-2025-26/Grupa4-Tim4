@@ -2,7 +2,8 @@
     var currentArea = ViewContext.RouteData.Values["area"]?.ToString();
     var currentController = ViewContext.RouteData.Values["Controller"]?.ToString();
     var currentAction = ViewContext.RouteData.Values["Action"]?.ToString();
-    var isHome = string.IsNullOrEmpty(currentArea) && currentController == "Home" && currentAction == "Index";
+    var isHome = string.IsNullOrEmpty(currentArea) && currentController == "Home" &&
+        (currentAction == "Index" || currentAction == "AdminIndex" || currentAction == "ClientIndex" || currentAction == "UposlenikIndex");
     var isZahtjevi = currentController == "Osoba" && currentAction == "ZahtjeviZaRacun";
     var isAdministration = currentController == "Osoba" && currentAction == "Index";
     var isUserSearch = currentController == "Osoba" && currentAction == "UserSearch";
