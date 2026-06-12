@@ -87,13 +87,11 @@ namespace ETFPay.Controllers
 
             try
             {
-                if (ModelState.IsValid)
+                var currentUser = await _userManager.GetUserAsync(User);
+                if (currentUser == null)
                 {
-                    var currentUser = await _userManager.GetUserAsync(User);
-                    if (currentUser == null)
-                    {
-                        return Unauthorized();
-                    }
+                    return Unauthorized();
+                }
 
                     var mojBrojRacuna = await _context.Racun
                         .Where(r => r.Id == currentUser.Racun)
@@ -108,7 +106,7 @@ namespace ETFPay.Controllers
 
                     predlozak.Id = Guid.NewGuid().ToString();
                     predlozak.Pretplata = true;
-                    predlozak.BrojRacuna = currentUser.Racun;
+                    predlozak.BrojRacuna = userWithAccount.RacunKorisnika.brojRacuna;
 
                     _context.Add(predlozak);
                     await _context.SaveChangesAsync();
@@ -177,13 +175,11 @@ namespace ETFPay.Controllers
 
             try
             {
-                if (ModelState.IsValid)
+                var currentUser = await _userManager.GetUserAsync(User);
+                if (currentUser == null)
                 {
-                    var currentUser = await _userManager.GetUserAsync(User);
-                    if (currentUser == null)
-                    {
-                        return Unauthorized();
-                    }
+                    return Unauthorized();
+                }
 
                     var mojBrojRacuna = await _context.Racun
                         .Where(r => r.Id == currentUser.Racun)
@@ -198,7 +194,7 @@ namespace ETFPay.Controllers
 
                     predlozak.Id = Guid.NewGuid().ToString();
                     predlozak.Pretplata = false;
-                    predlozak.BrojRacuna = currentUser.Racun;
+                    predlozak.BrojRacuna = userWithAccount.RacunKorisnika.brojRacuna;
 
                     _context.Add(predlozak);
                     await _context.SaveChangesAsync();
