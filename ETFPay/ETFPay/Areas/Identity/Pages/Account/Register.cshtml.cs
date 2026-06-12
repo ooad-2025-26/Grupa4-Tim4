@@ -56,6 +56,7 @@ public class RegisterModel : PageModel
     {
         [Required(ErrorMessage = "Email is required.")]
         [EmailAddress(ErrorMessage = "Invalid email address format.")]
+        [RegularExpression(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", ErrorMessage = "Enter a valid email address (e.g. name@example.com).")]
         [Display(Name = "Email")]
         public string Email { get; set; } = default!;
 
@@ -105,6 +106,10 @@ public class RegisterModel : PageModel
     {
         ReturnUrl = returnUrl;
         ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+        Input = new InputModel
+        {
+            DatumRodjenja = DateTime.Today.AddYears(-18)
+        };
     }
 
     public async Task<IActionResult> OnPostAsync(string? returnUrl = null)

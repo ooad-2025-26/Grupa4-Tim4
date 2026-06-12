@@ -36,8 +36,14 @@ namespace ETFPay.Controllers
             }
 
         
+            var brojRacunaKorisnika = await _context.Racun
+                .Where(r => r.Id == user.Racun)
+                .Select(r => r.brojRacuna)
+                .FirstOrDefaultAsync();
+
             var predlosciIzBaze = await _context.Predlozak
-                .Where(p => p.Pretplata == false && p.BrojRacuna == user.Racun)
+                .Where(p => p.Pretplata == false &&
+                    (p.BrojRacuna == user.Racun || p.BrojRacuna == brojRacunaKorisnika))
                 .ToListAsync();
 
             return View(predlosciIzBaze);

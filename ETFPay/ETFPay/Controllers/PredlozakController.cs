@@ -37,17 +37,14 @@ namespace ETFPay.Controllers
                 return Unauthorized();
             }
 
-            var userWithAccount = await _context.Users
-                .Include(u => u.RacunKorisnika)
-                .FirstOrDefaultAsync(u => u.Id == currentUser.Id);
-
-            if (userWithAccount?.RacunKorisnika == null)
-            {
-                return BadRequest("User account information is missing.");
-            }
+            var brojRacunaKorisnika = await _context.Racun
+                .Where(r => r.Id == currentUser.Racun)
+                .Select(r => r.brojRacuna)
+                .FirstOrDefaultAsync();
 
             var subscriptions = await _context.Predlozak
-                .Where(p => p.Pretplata == true && p.BrojRacuna == userWithAccount.RacunKorisnika.brojRacuna)
+                .Where(p => p.Pretplata == true &&
+                    (p.BrojRacuna == currentUser.Racun || p.BrojRacuna == brojRacunaKorisnika))
                 .ToListAsync();
 
             if (!subscriptions.Any())
@@ -96,22 +93,17 @@ namespace ETFPay.Controllers
                     return Unauthorized();
                 }
 
-                var userWithAccount = await _context.Users
-                    .Include(u => u.RacunKorisnika)
-                    .FirstOrDefaultAsync(u => u.Id == currentUser.Id);
+                    var mojBrojRacuna = await _context.Racun
+                        .Where(r => r.Id == currentUser.Racun)
+                        .Select(r => r.brojRacuna)
+                        .FirstOrDefaultAsync();
 
-                if (userWithAccount?.RacunKorisnika == null)
-                {
-                    return BadRequest("User account information is missing.");
-                }
+                    if (JeVlastitiRacun(predlozak.Primaoc, currentUser.Racun, mojBrojRacuna))
+                    {
+                        ModelState.AddModelError("Primaoc", "You cannot create a subscription to your own account.");
+                        return View(predlozak);
+                    }
 
-                if (predlozak.Primaoc == userWithAccount.RacunKorisnika.brojRacuna)
-                {
-                    ModelState.AddModelError("Primaoc", "You cannot create a subscription to pay to yourself.");
-                }
-
-                if (ModelState.IsValid)
-                {
                     predlozak.Id = Guid.NewGuid().ToString();
                     predlozak.Pretplata = true;
                     predlozak.BrojRacuna = userWithAccount.RacunKorisnika.brojRacuna;
@@ -138,17 +130,14 @@ namespace ETFPay.Controllers
                 return Unauthorized();
             }
 
-            var userWithAccount = await _context.Users
-                .Include(u => u.RacunKorisnika)
-                .FirstOrDefaultAsync(u => u.Id == currentUser.Id);
-
-            if (userWithAccount?.RacunKorisnika == null)
-            {
-                return BadRequest("User account information is missing.");
-            }
+            var brojRacunaKorisnika = await _context.Racun
+                .Where(r => r.Id == currentUser.Racun)
+                .Select(r => r.brojRacuna)
+                .FirstOrDefaultAsync();
 
             var templates = await _context.Predlozak
-                .Where(p => p.Pretplata == false && p.BrojRacuna == userWithAccount.RacunKorisnika.brojRacuna)
+                .Where(p => p.Pretplata == false &&
+                    (p.BrojRacuna == currentUser.Racun || p.BrojRacuna == brojRacunaKorisnika))
                 .ToListAsync();
 
             if (!templates.Any())
@@ -192,22 +181,17 @@ namespace ETFPay.Controllers
                     return Unauthorized();
                 }
 
-                var userWithAccount = await _context.Users
-                    .Include(u => u.RacunKorisnika)
-                    .FirstOrDefaultAsync(u => u.Id == currentUser.Id);
+                    var mojBrojRacuna = await _context.Racun
+                        .Where(r => r.Id == currentUser.Racun)
+                        .Select(r => r.brojRacuna)
+                        .FirstOrDefaultAsync();
 
-                if (userWithAccount?.RacunKorisnika == null)
-                {
-                    return BadRequest("User account information is missing.");
-                }
+                    if (JeVlastitiRacun(predlozak.Primaoc, currentUser.Racun, mojBrojRacuna))
+                    {
+                        ModelState.AddModelError("Primaoc", "You cannot create a template to your own account.");
+                        return View(predlozak);
+                    }
 
-                if (predlozak.Primaoc == userWithAccount.RacunKorisnika.brojRacuna)
-                {
-                    ModelState.AddModelError("Primaoc", "You cannot create a template to pay to yourself.");
-                }
-
-                if (ModelState.IsValid)
-                {
                     predlozak.Id = Guid.NewGuid().ToString();
                     predlozak.Pretplata = false;
                     predlozak.BrojRacuna = userWithAccount.RacunKorisnika.brojRacuna;
@@ -389,6 +373,16 @@ namespace ETFPay.Controllers
                         return Unauthorized();
                     }
 
+                    var mojBrojRacuna = await _context.Racun
+                        .Where(r => r.Id == currentUser.Racun)
+                        .Select(r => r.brojRacuna)
+                        .FirstOrDefaultAsync();
+
+                    if (JeVlastitiRacun(predlozak.Primaoc, currentUser.Racun, mojBrojRacuna))
+                    {
+                        return BadRequest(new { message = "You cannot create a template to your own account." });
+                    }
+
                     predlozak.Id = Guid.NewGuid().ToString();
                     predlozak.Pretplata = false;
                     predlozak.BrojRacuna = currentUser.Racun;
@@ -414,6 +408,15 @@ namespace ETFPay.Controllers
             {
                 return StatusCode(500, new { message = "Greška prilikom spasavanja u bazu: " + ex.Message });
             }
+        }
+
+        private static bool JeVlastitiRacun(string? primaoc, string? racunId, string? brojRacuna)
+        {
+            if (string.IsNullOrWhiteSpace(primaoc))
+                return false;
+
+            return (!string.IsNullOrEmpty(racunId) && primaoc == racunId)
+                || (!string.IsNullOrEmpty(brojRacuna) && primaoc == brojRacuna);
         }
 
         private bool PredlozakExists(string id)

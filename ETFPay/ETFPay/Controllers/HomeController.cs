@@ -32,6 +32,11 @@ namespace ETFPay.Controllers
                 {
                     return RedirectToAction("ClientIndex", "Home");
                 }
+
+                if (User.IsInRole("Uposlenik"))
+                {
+                    return RedirectToAction("ZahtjeviZaRacun", "Osoba");
+                }
             }
             return View();
         }

@@ -5,7 +5,7 @@
     ViewData["Title"] = "Log in";
 }
 
-<div class="container mt-5">
+<div class="container mt-5" style="padding-bottom: calc(var(--wave-height) + 2rem);">
     <div class="row justify-content-center text-center">
         <div class="col-md-4">
             <h1>@ViewData["Title"]</h1>
@@ -18,7 +18,7 @@
                 <form id="account" method="post">
                     <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
                     <div class="form-floating mb-3">
-                        <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                        <input asp-for="Input.Email" class="form-control" type="email" autocomplete="username" aria-required="true" placeholder="name@example.com" title="Enter a valid email address (e.g. name@example.com)" />
                         <label asp-for="Input.Email" class="form-label">Email</label>
                         <span asp-validation-for="Input.Email" class="text-danger"></span>
                     </div>

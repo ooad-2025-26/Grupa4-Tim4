@@ -116,6 +116,9 @@ namespace ETFPay.Controllers
             if (!DozvoljeneUloge.Contains(uloga))
                 ModelState.AddModelError("Novi.Uloga", "Selected role is not valid.");
 
+            if (!string.IsNullOrWhiteSpace(novi.BrojTelefona) && !System.Text.RegularExpressions.Regex.IsMatch(novi.BrojTelefona, @"^0\d{8,9}$"))
+                ModelState.AddModelError("Novi.BrojTelefona", "Phone number must start with 0 and contain 9 or 10 digits.");
+
             if (!ModelState.IsValid)
                 return View("Index", await BuildViewModelAsync(null, "novi", novi, null));
 
@@ -185,6 +188,9 @@ namespace ETFPay.Controllers
             var postojeci = await _userManager.FindByNameAsync(noviUsername);
             if (postojeci != null && postojeci.Id != user.Id)
                 ModelState.AddModelError("Odabrani.Username", "Username is already taken.");
+
+            if (!string.IsNullOrWhiteSpace(odabrani.BrojTelefona) && !System.Text.RegularExpressions.Regex.IsMatch(odabrani.BrojTelefona, @"^0\d{8,9}$"))
+                ModelState.AddModelError("Odabrani.BrojTelefona", "Phone number must start with 0 and contain 9 or 10 digits.");
 
             if (!ModelState.IsValid)
                 return View("Index", await BuildViewModelAsync(odabrani.Id, "edit", new NoviUposlenikForm(), odabrani));
