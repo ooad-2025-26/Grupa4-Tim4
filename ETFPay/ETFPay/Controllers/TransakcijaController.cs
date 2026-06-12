@@ -28,22 +28,20 @@ namespace ETFPay.Controllers
         {
         
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId);
+            var user = await _context.Users
+                .Include(u => u.RacunKorisnika)
+                .FirstOrDefaultAsync(x => x.Id == userId);
 
-            if (user == null || string.IsNullOrEmpty(user.Racun))
+            if (user?.RacunKorisnika == null)
             {
-                return View(new List<Predlozak>()); 
+                return View(new List<Predlozak>());
             }
 
-        
-            var brojRacunaKorisnika = await _context.Racun
-                .Where(r => r.Id == user.Racun)
-                .Select(r => r.brojRacuna)
-                .FirstOrDefaultAsync();
+            var brojRacuna = user.RacunKorisnika.brojRacuna;
 
             var predlosciIzBaze = await _context.Predlozak
                 .Where(p => p.Pretplata == false &&
-                    (p.BrojRacuna == user.Racun || p.BrojRacuna == brojRacunaKorisnika))
+                    (p.BrojRacuna == brojRacuna || p.BrojRacuna == user.Racun))
                 .ToListAsync();
 
             return View(predlosciIzBaze);
